@@ -78,12 +78,47 @@ class Airodump(Air):
         super(self.__class__, self).__init__(**kwargs)
 
     @property
-    def aps(self):
+    def tree(self):
         """
             Returns currently reported aps
         """
+        keys = [
+            'FirstTimeSeen',
+            'LastTimeSeen',
+            'channel',
+            'Speed',
+            'Privacy',
+            'Cipher',
+            'Authentication',
+            'Power',
+            'beacons',
+            'IV',
+            'LANIP',
+            'IDlength',
+            'ESSID',
+            'Key']
+
+        c_keys = [
+            'Station MAC',
+            'FirstTimeSeen',
+            'LastTimeSeen',
+            'Power',
+            'Packets',
+            'BSSID',
+            'ProbedESSIDs'
+        ]
+
         self.update_results()
-        return self._aps
+        aps = {}
+        for ap_ in self._aps:
+            bssid = ap_.pop(0)
+            aps[bssid] = dict(zip(keys, ap_))
+            aps[bssid]['clients'] = []
+
+            for client in self.clients:
+                if client[0] == bssid:
+                    aps[bssid]['clients'].append(dict(zip(c_keys, client)))
+        return aps
 
     @property
     def clients(self):
