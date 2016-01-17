@@ -12,6 +12,15 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
+PATH = os.environ['PATH']  #: TODO: Make this configurable
+
+
+def format_arg(arg):
+    if len(arg) > 1:
+        return "--{}".format(arg)
+    else:
+        return "-{}".format(arg)
+
 
 class LaunchError(Exception):
     """
@@ -44,9 +53,9 @@ class Air:
             to the action...
         """
         for arg in kwargs:
-            if arg not in self._allowed_arguments:
+            if arg not in dict(self._allowed_arguments):
                 raise WrongArgument()
-        self._exec_args = kwargs
+        self._exec_args = kwargs.items()
 
     @property
     def flags(self):
@@ -54,7 +63,7 @@ class Air:
             Returns flags
             yields a tuple
         """
-        return ["--{}".format(arg) for arg, value in self._exec_args
+        return [format_arg(arg) for arg, value in self._exec_args
                 if isinstance(value, bool)]
 
     @property
@@ -66,7 +75,7 @@ class Air:
         result = []
         for arg, value in self._exec_args:
             if not isinstance(value, bool):
-                result.extend(["--{}".format(arg), value])
+                result.extend([format_arg(arg), value])
         return result
 
     @property
