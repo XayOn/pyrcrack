@@ -56,7 +56,7 @@ class Airodump(Air):
         ('beacons', False),
         ('manufacturer', False),
         ('uptime', False),
-        ('ignore_negative_one ', False),
+        ('ignore_negative_one', False),
         ('a', False),
         ('showack', False),
         ('h', False),

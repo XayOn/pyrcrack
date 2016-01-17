@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import os
 import re
 import subprocess
 from contextlib import suppress
-from . import Air
+from . import Air, PATH
 
 
 class Airmon(Air):
@@ -17,8 +16,8 @@ class Airmon(Air):
         ::
 
             wifi = Airmon().start('wlan0')
-            Airmon().stop('wlan0')
-            Airmon().check('wlan0')
+            Airmon('smoothie0').stop()
+            Airmon('wlan0').check()
 
         or as
 
