@@ -198,17 +198,20 @@ class Airodump(Air):
             for line in file_[num:]:
                 clis.append(line)
 
-        self._aps = [[a.strip() for a in row]
-                     for row in csv.reader(StringIO('\n'.join(aps)))
-                     if row]
-        self._clients = [[a.strip() for a in row]
-                         for row in csv.reader(StringIO('\n'.join(clis)))
-                         if row]
+        def clean_rows(reader):
+            """
+                Airodump-ng's csv info comes a bit unclean.
+                Strip each line of its extra blank spaces
+            """
+            return [[a.strip() for a in row] for row in reader if row]
+
+        self._aps = clean_rows(csv.reader(StringIO('\n'.join(aps))))
+        self._clients = clean_rows(csv.reader(StringIO('\n'.join(clis))))
 
     def __enter__(self, *args, **kwargs):
         self.start(*args, **kwargs)
         return self
 
     def __exit__(self, *args, **kwargs):
-        self.stop(*args, **kwargs)
+        self.stop()
         return self
