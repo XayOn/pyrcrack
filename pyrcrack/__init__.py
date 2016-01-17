@@ -10,6 +10,8 @@ import os
 import tempfile
 import logging
 
+__version__ = "0.0.1"
+
 logging.basicConfig(level=logging.INFO)
 
 PATH = os.environ['PATH']  #: TODO: Make this configurable

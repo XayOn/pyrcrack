@@ -8,6 +8,9 @@ except ImportError:
     from distutils.core import setup
 
 
+import pyrcrack
+
+
 with open('README.rst') as readme_file:
     readme = readme_file.read()
 
@@ -24,7 +27,7 @@ test_requirements = [
 
 setup(
     name='pyrcrack',
-    version='0.1.0',
+    version=pyrcrack.__version__,
     description="Simple aircrack-ng implementation in python, giving access to common commands and way to read its output / control its execution",
     long_description=readme + '\n\n' + history,
     author="David Francos Cuartero",
