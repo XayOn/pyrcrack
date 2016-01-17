@@ -133,17 +133,21 @@ class Airodump(Air):
                 if line.startswith('Station'):
                     num += 1
                     break
-                aps.append([a.strip() for a in line])
+                aps.append(line)
             for line in file_[num:]:
-                clis.append([a.strip() for a in line])
+                clis.append(line)
 
-        self._aps = [row for row in csv.reader(StringIO('\n'.join(aps)))
+        self._aps = [[a.strip() for a in row]
+                     for row in csv.reader(StringIO('\n'.join(aps)))
                      if row]
-        self._clients = [row for row in csv.reader(StringIO('\n'.join(clis)))
+        self._clients = [[a.strip() for a in row]
+                         for row in csv.reader(StringIO('\n'.join(clis)))
                          if row]
 
     def __enter__(self, *args, **kwargs):
         self.start(*args, **kwargs)
+        return self
 
     def __exit__(self, *args, **kwargs):
         self.stop(*args, **kwargs)
+        return self
