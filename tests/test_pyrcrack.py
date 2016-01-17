@@ -10,8 +10,7 @@ Tests for `pyrcrack` module.
 
 import unittest
 
-from pyrcrack import pyrcrack
-
+import pyrcrack
 
 class TestPyrcrack(unittest.TestCase):
 
