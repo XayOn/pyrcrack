@@ -106,6 +106,7 @@ class Airodump(Air):
                                stderr=DEVNULL, stdin=DEVNULL, stdout=DEVNULL)
             os.system('stty sane')
 
+        time.sleep(5)
         watcher = threading.Thread(target=self.watch_process)
         watcher.start()
 
