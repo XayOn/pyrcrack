@@ -209,7 +209,7 @@ latex_elements = {
 # [howto/manual]).
 latex_documents = [
     ('index', 'pyrcrack.tex',
-     u'Aircrack-ng python 'bindings' Documentation',
+     u'Aircrack-ng python \'bindings\' Documentation',
      u'David Francos Cuartero', 'manual'),
 ]
 
@@ -240,7 +240,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'pyrcrack',
-     u'Aircrack-ng python 'bindings' Documentation',
+     u'Aircrack-ng python \'bindings\' Documentation',
      [u'David Francos Cuartero'], 1)
 ]
 
@@ -255,7 +255,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     ('index', 'pyrcrack',
-     u'Aircrack-ng python 'bindings' Documentation',
+     u'Aircrack-ng python \'bindings\' Documentation',
      u'David Francos Cuartero',
      'pyrcrack',
      'One line description of project.',
