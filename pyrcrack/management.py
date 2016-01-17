@@ -33,20 +33,26 @@ class Airmon(Air):
             We need this to use the context manager.
             So I decided to make interface mandatory
         """
-        self.interface = interface
+        self.interface = interface  #: Wireless interface
         super(self.__class__, self).__init__()
 
     def _do_action(self, what):
         """
-            Generic do_action.
+            Execute airmon-ng with MON_PREFIX and PATH set.
         """
-        env = {'PATH': os.environ['PATH'], 'MON_PREFIX': 'smoothie'}
+        env = {'PATH': PATH, 'MON_PREFIX': 'smoothie'}
         return subprocess.check_output(["airmon-ng", what,
                                         self.interface], env=env)
 
     def start(self):
         """
-            Start
+            Executes
+
+            ::
+
+                airmon-ng  start <WIFI>
+
+            and replaces self.interface with the monitor interface.
         """
         ret = self._do_action('start')
 
@@ -56,7 +62,7 @@ class Airmon(Air):
 
     def stop(self):
         """
-            Stop
+            Stops monitor mode on current interface
         """
         with suppress(subprocess.CalledProcessError):
             self._do_action('stop')

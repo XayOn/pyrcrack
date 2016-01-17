@@ -38,7 +38,8 @@ class WrongArgument(Exception):
 
 class Air:
     """
-        Inherit this
+        This is the base class for most aircrack-ng classes.
+        Used mainly because its argument handling and writepath.
     """
     _writepath = False
     _allowed_arguments = False

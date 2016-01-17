@@ -18,9 +18,33 @@ class Airodump(Air):
         Please referr to airodump-ng's help
         for this.
 
+        This accepts the following parameters from airodump-ng's help.
+
+        * ivs
+        * gpsd
+        * beacons
+        * manufacturer
+        * uptime
+        * ignore_negative_one
+        * a
+        * showack
+        * h
+        * f
+        * update
+        * berlin
+        * r
+        * x
+        * encrypt
+        * netmask
+        * bssid
+        * essid
+        * output_format
+        * write
+        * essid_regex
+
         .. TODO::
 
-            Automagically extract this help =)
+            Automagically extract this help from airodump-ng =)
      """
 
     _aps = []
@@ -82,7 +106,8 @@ class Airodump(Air):
     def watch_process(self):
         """
             Watcher thread.
-            This one relaunches airodump eatch time it dies
+            This one relaunches airodump eatch time it dies until
+            we call stop()
         """
         psutil.wait_procs([psutil.Process(self._proc.pid)],
                           callback=self.start)
