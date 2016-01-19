@@ -65,11 +65,3 @@ class Airmon(Air):
         """
         with suppress(subprocess.CalledProcessError):
             self._do_action('stop')
-
-    def __enter__(self, *args, **kwargs):
-        self.start(*args, **kwargs)
-        return self
-
-    def __exit__(self, *args, **kwargs):
-        self.stop()
-        return self

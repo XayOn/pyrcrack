@@ -107,3 +107,18 @@ class Air:
             Return current execution's csv location
         """
         return "{}-{}.csv".format(self.writepath, self.current_execution)
+
+    def stop(self):
+        """
+            Stop proc.
+        """
+        self._stop = True
+        return self._proc.kill()
+
+    def __enter__(self, *args, **kwargs):
+        self.start(*args, **kwargs)
+        return self
+
+    def __exit__(self, *args, **kwargs):
+        self.stop()
+        return self

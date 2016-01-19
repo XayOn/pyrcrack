@@ -9,6 +9,7 @@ import psutil
 import threading
 from . import Air, WrongArgument
 from subprocess import Popen, DEVNULL
+from contextlib import suppress
 
 
 class Aireplay(Air):
@@ -75,11 +76,12 @@ class Aireplay(Air):
             raise WrongArgument
 
         self.attack = attack
+        extra = tuple()
+        with suppress(AttributeError):
+            extra = getattr(self, "_allowed_arguments_{}".format(attack))
         self._allowed_arguments = self._allowed_arguments + \
-            getattr(self, "_allowed_arguments_{}".format(attack)) + \
-            (attack, False)
+            extra + (attack, False),
         kwargs[attack] = True
-
         super(self.__class__, self).__init__(**kwargs)
 
     def scan(self):
@@ -119,18 +121,3 @@ class Aireplay(Air):
         time.sleep(5)
         watcher = threading.Thread(target=self.watch_process)
         watcher.start()
-
-    def stop(self):
-        """
-            Stop proc.
-        """
-        self._stop = True
-        return self._proc.kill()
-
-    def __enter__(self, *args, **kwargs):
-        self.start(*args, **kwargs)
-        return self
-
-    def __exit__(self, *args, **kwargs):
-        self.stop()
-        return self
