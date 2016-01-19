@@ -92,3 +92,42 @@ class Aircrack(Air):
                            env={'PATH': os.environ['PATH']},
                            stderr=DEVNULL, stdin=DEVNULL, stdout=DEVNULL)
         os.system('stty sane')
+
+
+class Wesside(Air):
+    """
+        Please referr to wesside-ng's help
+        for this.
+
+        This accepts all parameters from wesside-ng's help.
+     """
+
+    _stop = False
+
+    _allowed_arguments = (
+        ('h', False),
+        ('i', False),
+        ('n', False),
+        ('m', False),
+        ('a', False),
+        ('c', False),
+        ('p', False),
+        ('v', False),
+        ('t', False),
+        ('f', False),
+    )
+
+    def __init__(self, interface=False, **kwargs):
+        self.interface = interface
+        super(self.__class__, self).__init__(**kwargs)
+
+    def start(self):
+        """
+            Start process.
+        """
+        params = self.flags + self.arguments
+        line = ["wesside-ng"] + params + [self.interface]
+        self._proc = Popen(line, bufsize=0,
+                           env={'PATH': os.environ['PATH']},
+                           stderr=DEVNULL, stdin=DEVNULL, stdout=DEVNULL)
+        os.system('stty sane')
