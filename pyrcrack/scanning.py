@@ -207,11 +207,3 @@ class Airodump(Air):
 
         self._aps = clean_rows(csv.reader(StringIO('\n'.join(aps))))
         self._clients = clean_rows(csv.reader(StringIO('\n'.join(clis))))
-
-    def __enter__(self, *args, **kwargs):
-        self.start(*args, **kwargs)
-        return self
-
-    def __exit__(self, *args, **kwargs):
-        self.stop()
-        return self
