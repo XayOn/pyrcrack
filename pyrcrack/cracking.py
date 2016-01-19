@@ -62,7 +62,6 @@ class Aircrack(Air):
         ('J', False),
         ('S', False),
         ('r', False),
-        (')', False),
     )
 
     _allowed_attacks = (
@@ -87,7 +86,6 @@ class Aircrack(Air):
         """
             Start process.
         """
-        self._current_execution += 1
         params = self.flags + self.arguments
         line = ["aircrack-ng"] + params + [self.file_]
         self._proc = Popen(line, bufsize=0,

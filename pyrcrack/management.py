@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import re
+import os
 import subprocess
 from contextlib import suppress
-from . import Air, PATH
+from . import Air, PATH, WrongArgument
+from subprocess import DEVNULL, Popen
 
 
 class Airmon(Air):
@@ -65,3 +67,64 @@ class Airmon(Air):
         """
         with suppress(subprocess.CalledProcessError):
             self._do_action('stop')
+
+
+class Airdecap(Air):
+    """
+        Airdecap-ng object.
+    """
+
+    _allowed_arguments = (
+        ('l', False),
+        ('b', False),
+        ('e', False),
+    )
+
+    _allowed_arguments_wep = (
+        ('w', False),
+    )
+
+    _allowed_arguments_wpa = (
+        ('p', False),
+        ('k', False),
+    )
+
+    _allowed_attacks = (
+        'wpa', 'wep'
+    )
+
+    def __init__(self, attack=False, file_=False, **kwargs):
+        self.file_ = file_
+
+        if attack not in self._allowed_attacks:
+            raise WrongArgument
+
+        self.attack = attack
+        extra = tuple()
+        with suppress(AttributeError):
+            extra = getattr(self, "_allowed_arguments_{}".format(attack))
+        self._allowed_arguments = self._allowed_arguments + \
+            extra
+        super(self.__class__, self).__init__(**kwargs)
+
+    def start(self):
+        """
+            Executes airdecap-ng
+        """
+        params = self.flags + self.arguments
+        line = ["airdecap-ng"] + params + [self.file_]
+        self._proc = Popen(line, bufsize=0,
+                           env={'PATH': os.environ['PATH']},
+                           stderr=DEVNULL, stdin=DEVNULL, stdout=DEVNULL)
+        os.system('stty sane')
+        return self.result
+
+    @property
+    def result(self):
+        """
+            Returns the resulting file.
+        """
+        parts = self.file_.split('.')
+        parts_ = parts[:-1]
+        parts_.extend(["{}-dec.{}".format(parts[-2], parts[-1])])
+        return '.'.join(parts_)
