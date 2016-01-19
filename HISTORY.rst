@@ -2,7 +2,13 @@
 History
 =======
 
-0.1.0 (2015-12-13)
+0.1.0 (2015-01-20)
 ------------------
 
-* First release on PyPI.
+* Implemented main classes as context managers:
+* Aircrack
+* Wesside
+* Aireplay
+* Airodump
+* Airmon
+* Airdecap
