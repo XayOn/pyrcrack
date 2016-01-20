@@ -14,16 +14,8 @@ from contextlib import suppress
 
 class Aireplay(Air):
     """
-        Please referr to airodump-ng's help
-        for this.
-
-        This accepts the following parameters from airodump-ng's help.
-
-
-        .. TODO::
-
-            Automagically extract this help from airodump-ng =)
-     """
+    TODO
+    """
 
     _stop = False
     _allowed_arguments = (

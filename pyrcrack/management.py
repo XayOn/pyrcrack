@@ -10,10 +10,15 @@ from subprocess import DEVNULL, Popen
 
 class Airmon(Air):
     """
-        Airmon-ng object.
 
-        It doubles as a context manager.
-        So you can call it as
+        Introduction
+        ------------
+
+        Airmon-ng manages monitor mode and virtual monitor interfaces
+        As parameter it only accepts the interface, and has three methods
+        (start, stop and check).
+
+        As everything else, is a context manager, so you can do:
 
         ::
 
@@ -21,25 +26,23 @@ class Airmon(Air):
             Airmon('smoothie0').stop()
             Airmon('wlan0').check()
 
-        or as
+        or:
 
         ::
+
             with Airmon('wlan0') as f:
                 print(f.interface)
 
     """
 
     def __init__(self, interface):
-        """
-            We need this to use the context manager.
-            So I decided to make interface mandatory
-        """
         self.interface = interface  #: Wireless interface
         super(self.__class__, self).__init__()
 
     def _do_action(self, what):
         """
             Execute airmon-ng with MON_PREFIX and PATH set.
+            start, stop and check relies on this.
         """
         env = {'PATH': PATH, 'MON_PREFIX': 'smoothie'}
         return subprocess.check_output(["airmon-ng", what,
@@ -64,14 +67,54 @@ class Airmon(Air):
     def stop(self):
         """
             Stops monitor mode on current interface
+            efectively deleting it.
+
+            Previously it was necessary to execute iw dev <iface> del but
+            that no longer seems to be the case.
+
+            This won't fail no matter what, so be careful.
         """
         with suppress(subprocess.CalledProcessError):
             self._do_action('stop')
 
+    def check(self):
+        """
+            Executes airmon-ng check <interface>, returns output
+        """
+        return self._do_action('check')
+
 
 class Airdecap(Air):
     """
-        Airdecap-ng object.
+        Introduction
+        ------------
+
+        Decrypts a wep / wpa pcap file
+
+        Mandatory arguments are attack type (wep|wpa) and pcap file
+
+        .. param file_:: pcap file to decrypt
+        .. param attack:: encryption (wep|wpa)
+
+        Attack is actually used only to enforce correct parameters
+        for each attack.
+
+        Allowed arguments are:
+
+        Common:
+
+            Airdecap('wep|wpa', 'foo.cap', l=False, b=False, e=False)
+
+        Wep:
+
+            Airdecap('wep', 'foo.cap', w=False)
+
+        Wpa:
+
+            Airdecap('wep', 'foo.cap', p=False, k=False)
+
+        As with the rest, this can be used as a context manager
+
     """
 
     _allowed_arguments = (
@@ -122,7 +165,7 @@ class Airdecap(Air):
     @property
     def result(self):
         """
-            Returns the resulting file.
+            Path to the generated decrypted pcap file
         """
         parts = self.file_.split('.')
         parts_ = parts[:-1]

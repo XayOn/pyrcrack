@@ -1,35 +1,98 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-    Replaying options
+
+    Cracking utilities
+    ----------------
+
+    This module contains everything related to cracking.
+    Actually, this makes:
+
+        - Aircrack
+        - Wesside
+
+    That's so because wesside has its own cracking option.
+
 """
 import os
+import re
 from . import Air, WrongArgument
-from subprocess import Popen, DEVNULL
+from subprocess import Popen, DEVNULL, PIPE
 from contextlib import suppress
 
 
 class Aircrack(Air):
     """
-        Please referr to aircrack-ng's help
-        for this.
-
-        This accepts the following parameters from aircrack-ng's help.
+        Introduction
+        ------------
 
 
-        .. TODO::
+        Aircrack-ng is a powerful wireless cracking tool.
+        Supporting two main attack types (against wep or wpa) it accepts
+        different options for each.
 
-            Automagically extract this help from airodump-ng =)
+        That means you'll only be able to use specific options for specific
+        attacks.
+
+        .. param attack: Chosen attack (wep|wpa)
+        .. param file_: CAP or IVS file to crack
+
+        The rest of the params are gotten using *args, **kwargs magic,
+        so you'll need to manually consult them here.
+
+        General options (Note that you can combine these with wpa or wep)
+
+        ::
+
+            Aircrack('wep|wpa', 'file_foo.ivs', a=false, essid=false,
+                     bssid=false, p=false, E=false, q=false, combine=false,
+                     l=false, w=false)
+
+        WEP options:
+
+        ::
+
+            Aircrack('wep', 'file_foo.ivs' c=False, t=False, h=False,
+                      debug=False, m=False, n=False, i=False, f=False,
+                      k=False, x=False, x1=False, x2=False, X=False,
+                      y=False, K=False, s=False, M=False, wep_decloack=False,
+                      ptw_debug=False, oneshot=False)
+
+        WPA options:
+
+        ::
+
+            Aircrack('wpa', 'file_foo.cap', S=False, r=False)
+
+
+        Don't forget these are context managers, but also can be called
+        manually
+
+        ::
+
+            foo = Aircrack('wpa', 'file')
+            foo.start()
+            time.sleep(1000)
+            print(foo.result)
+            foo.stop()
+
+        ::
+
+            with Aircrack('wpa', 'foo'):
+                time.sleep(1000)
+                print(_.result)
+
      """
 
     _stop = False
     _allowed_arguments = (
         ('a', False),
-        ('e', False),
-        ('b', False),
+        ('essid', False),
+        ('bssid', False),
         ('p', False),
         ('q', False),
-        ('C', False),
+        ('combine', False),
+        ('E', False),
         ('l', False),
         ('w', False),
     )
@@ -38,7 +101,7 @@ class Aircrack(Air):
         ('c', False),
         ('t', False),
         ('h', False),
-        ('d', False),
+        ('debug', False),
         ('m', False),
         ('n', False),
         ('i', False),
@@ -52,14 +115,12 @@ class Aircrack(Air):
         ('K', False),
         ('s', False),
         ('M', False),
-        ('D', False),
-        ('P', False),
-        ('1', False),
+        ('wep_decloack', False),
+        ('ptw_debug', False),
+        ('oneshot', False)
     )
 
     _allowed_arguments_wpa = (
-        ('E', False),
-        ('J', False),
         ('S', False),
         ('r', False),
     )
@@ -96,17 +157,56 @@ class Aircrack(Air):
 
 class Wesside(Air):
     """
-        Please referr to wesside-ng's help
-        for this.
+        Introduction
+        ------------
 
-        This accepts all parameters from wesside-ng's help.
-     """
+        Wesside-ng is an auto-magic tool to obtain a WEP key
+        with as less interaction from the user as possible.
+
+        The only actual required option is the interface,
+        as if no interface specified, it'll try to crack any.
+
+        This is only for WEP networks and does not need anything
+        out of the ordinary
+
+        Usage example:
+
+        ::
+
+            Wesside('mon0', n="192.168.1.3", m="192.168.1.2",
+                    a="aa:bb:cc:dd:ee:ff", c=False, p=128, v="WLAN_FOO",
+                    t=10000, f=11)
+
+
+        Don't forget these are context managers, but also can be called
+        manually
+
+        ::
+
+            foo = Wesside('mon0', n="192.168.1.3", m="192.168.1.2",
+                          a="aa:bb:cc:dd:ee:ff", c=False, p=128,
+                          v="WLAN_FOO", t=10000, f=11)
+
+            foo.start()
+            time.sleep(1000)
+            print(_.result)
+            foo.stop()
+
+        ::
+
+            with Wesside('mon0', n="192.168.1.3", m="192.168.1.2",
+                          a="aa:bb:cc:dd:ee:ff", c=False, p=128,
+                          v="WLAN_FOO", t=10000, f=11):
+                time.sleep(1000)
+                print(_.result)
+
+
+
+    """
 
     _stop = False
 
     _allowed_arguments = (
-        ('h', False),
-        ('i', False),
         ('n', False),
         ('m', False),
         ('a', False),
@@ -126,8 +226,18 @@ class Wesside(Air):
             Start process.
         """
         params = self.flags + self.arguments
-        line = ["wesside-ng"] + params + [self.interface]
+        line = ["wesside-ng"] + params + ["-i", self.interface]
         self._proc = Popen(line, bufsize=0,
                            env={'PATH': os.environ['PATH']},
-                           stderr=DEVNULL, stdin=DEVNULL, stdout=DEVNULL)
+                           stderr=DEVNULL, stdin=DEVNULL, stdout=PIPE)
         os.system('stty sane')
+
+    @property
+    def result(self):
+        """
+            Searches for a key in wesside-ng's output to stdout.
+        """
+        with suppress(IndexError):
+            data = self._proc.communicate().decode()
+            return re.match("KEY=\((.*)\)", data).groups()[0]
+        return False

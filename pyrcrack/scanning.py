@@ -15,8 +15,8 @@ from subprocess import Popen, DEVNULL
 
 class Airodump(Air):
     """
-        Please referr to airodump-ng's help
-        for this.
+
+        TODO
 
         This accepts the following parameters from airodump-ng's help.
 
@@ -41,10 +41,6 @@ class Airodump(Air):
         * output_format
         * write
         * essid_regex
-
-        .. TODO::
-
-            Automagically extract this help from airodump-ng =)
      """
 
     _aps = []
