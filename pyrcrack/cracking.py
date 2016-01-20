@@ -1,7 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-    Replaying options
+
+    Replay utilities
+    ----------------
+
+    This module contains everything related to cracking.
+    Actually, this makes:
+
+        - Aircrack
+        - Wesside
+
+    That's so because wesside has its own cracking option.
+
 """
 import os
 from . import Air, WrongArgument
@@ -11,25 +22,57 @@ from contextlib import suppress
 
 class Aircrack(Air):
     """
-        Please referr to aircrack-ng's help
-        for this.
-
-        This accepts the following parameters from aircrack-ng's help.
+        Introduction
+        ------------
 
 
-        .. TODO::
+        Aircrack-ng is a powerful wireless cracking tool.
+        Supporting two main attack types (against wep or wpa) it accepts
+        different options for each.
 
-            Automagically extract this help from airodump-ng =)
+        That means you'll only be able to use specific options for specific
+        attacks.
+
+        .. param attack: Chosen attack (wep|wpa)
+        .. param file_: CAP or IVS file to crack
+
+        The rest of the params are gotten using *args, **kwargs magic,
+        so you'll need to manually consult them here.
+
+        General options (Note that you can combine these with wpa or wep)
+
+        ::
+
+            Aircrack('wep|wpa', a=false, essid=false, bssid=false,
+                     p=false, E=false, q=false, combine=false, l=false,
+                     w=false)
+
+        WEP options:
+
+        ::
+
+            Aircrack('wep', c=False, t=False, h=False, debug=False, m=False,
+                      n=False, i=False, f=False, k=False, x=False, x1=False,
+                      x2=False, X=False, y=False, K=False, s=False, M=False,
+                      wep_decloack=False, ptw_debug=False, oneshot=False)
+
+        WPA options:
+
+        ::
+
+            Aircrack('wpa', S=False, r=False)
+
      """
 
     _stop = False
     _allowed_arguments = (
         ('a', False),
-        ('e', False),
-        ('b', False),
+        ('essid', False),
+        ('bssid', False),
         ('p', False),
         ('q', False),
-        ('C', False),
+        ('combine', False),
+        ('E', False),
         ('l', False),
         ('w', False),
     )
@@ -38,7 +81,7 @@ class Aircrack(Air):
         ('c', False),
         ('t', False),
         ('h', False),
-        ('d', False),
+        ('debug', False),
         ('m', False),
         ('n', False),
         ('i', False),
@@ -52,14 +95,12 @@ class Aircrack(Air):
         ('K', False),
         ('s', False),
         ('M', False),
-        ('D', False),
-        ('P', False),
-        ('1', False),
+        ('wep_decloack', False),
+        ('ptw_debug', False),
+        ('oneshot', False)
     )
 
     _allowed_arguments_wpa = (
-        ('E', False),
-        ('J', False),
         ('S', False),
         ('r', False),
     )
