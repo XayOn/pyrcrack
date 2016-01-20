@@ -10,7 +10,7 @@ import os
 import tempfile
 import logging
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 logging.basicConfig(level=logging.INFO)
 
