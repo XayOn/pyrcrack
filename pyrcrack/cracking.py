@@ -15,8 +15,9 @@
 
 """
 import os
+import re
 from . import Air, WrongArgument
-from subprocess import Popen, DEVNULL
+from subprocess import Popen, DEVNULL, PIPE
 from contextlib import suppress
 
 
@@ -64,7 +65,8 @@ class Aircrack(Air):
             Aircrack('wpa', 'file_foo.cap', S=False, r=False)
 
 
-        Don't forget these are context managers, but also can be called manually
+        Don't forget these are context managers, but also can be called
+        manually
 
         ::
 
@@ -155,17 +157,56 @@ class Aircrack(Air):
 
 class Wesside(Air):
     """
-        Please referr to wesside-ng's help
-        for this.
+        Introduction
+        ------------
 
-        This accepts all parameters from wesside-ng's help.
-     """
+        Wesside-ng is an auto-magic tool to obtain a WEP key
+        with as less interaction from the user as possible.
+
+        The only actual required option is the interface,
+        as if no interface specified, it'll try to crack any.
+
+        This is only for WEP networks and does not need anything
+        out of the ordinary
+
+        Usage example:
+
+        ::
+
+            Wesside('mon0', n="192.168.1.3", m="192.168.1.2",
+                    a="aa:bb:cc:dd:ee:ff", c=False, p=128, v="WLAN_FOO",
+                    t=10000, f=11)
+
+
+        Don't forget these are context managers, but also can be called
+        manually
+
+        ::
+
+            foo = Wesside('mon0', n="192.168.1.3", m="192.168.1.2",
+                          a="aa:bb:cc:dd:ee:ff", c=False, p=128,
+                          v="WLAN_FOO", t=10000, f=11)
+
+            foo.start()
+            time.sleep(1000)
+            print(_.result)
+            foo.stop()
+
+        ::
+
+            with Wesside('mon0', n="192.168.1.3", m="192.168.1.2",
+                          a="aa:bb:cc:dd:ee:ff", c=False, p=128,
+                          v="WLAN_FOO", t=10000, f=11):
+                time.sleep(1000)
+                print(_.result)
+
+
+
+    """
 
     _stop = False
 
     _allowed_arguments = (
-        ('h', False),
-        ('i', False),
         ('n', False),
         ('m', False),
         ('a', False),
@@ -185,8 +226,18 @@ class Wesside(Air):
             Start process.
         """
         params = self.flags + self.arguments
-        line = ["wesside-ng"] + params + [self.interface]
+        line = ["wesside-ng"] + params + ["-i", self.interface]
         self._proc = Popen(line, bufsize=0,
                            env={'PATH': os.environ['PATH']},
-                           stderr=DEVNULL, stdin=DEVNULL, stdout=DEVNULL)
+                           stderr=DEVNULL, stdin=DEVNULL, stdout=PIPE)
         os.system('stty sane')
+
+    @property
+    def result(self):
+        """
+            Searches for a key in wesside-ng's output to stdout.
+        """
+        with suppress(IndexError):
+            data = self._proc.communicate().decode()
+            return re.match("KEY=\((.*)\)", data).groups()[0]
+        return False
