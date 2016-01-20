@@ -43,24 +43,42 @@ class Aircrack(Air):
 
         ::
 
-            Aircrack('wep|wpa', a=false, essid=false, bssid=false,
-                     p=false, E=false, q=false, combine=false, l=false,
-                     w=false)
+            Aircrack('wep|wpa', 'file_foo.ivs', a=false, essid=false,
+                     bssid=false, p=false, E=false, q=false, combine=false,
+                     l=false, w=false)
 
         WEP options:
 
         ::
 
-            Aircrack('wep', c=False, t=False, h=False, debug=False, m=False,
-                      n=False, i=False, f=False, k=False, x=False, x1=False,
-                      x2=False, X=False, y=False, K=False, s=False, M=False,
-                      wep_decloack=False, ptw_debug=False, oneshot=False)
+            Aircrack('wep', 'file_foo.ivs' c=False, t=False, h=False,
+                      debug=False, m=False, n=False, i=False, f=False,
+                      k=False, x=False, x1=False, x2=False, X=False,
+                      y=False, K=False, s=False, M=False, wep_decloack=False,
+                      ptw_debug=False, oneshot=False)
 
         WPA options:
 
         ::
 
-            Aircrack('wpa', S=False, r=False)
+            Aircrack('wpa', 'file_foo.cap', S=False, r=False)
+
+
+        Don't forget these are context managers, but also can be called manually
+
+        ::
+
+            foo = Aircrack('wpa', 'file')
+            foo.start()
+            time.sleep(1000)
+            print(foo.result)
+            foo.stop()
+
+        ::
+
+            with Aircrack('wpa', 'foo'):
+                time.sleep(1000)
+                print(_.result)
 
      """
 
