@@ -31,6 +31,12 @@ Features
 * Airdecap
 
 
+Usage
+-----
+
+Have a look at the :ref:`modindex`
+
+
 Credits
 ---------
 
