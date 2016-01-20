@@ -13,15 +13,23 @@ Aircrack-ng python 'bindings'
         :alt: Documentation Status
 
 
-Simple aircrack-ng implementation in python, giving access to common commands and way to read its output / control its execution
+Simple aircrack-ng implementation in python, giving access to common 
+commands and way to read its output / control its execution
 
-* Free software: ISC license
+* Free software: GPL2+c
 * Documentation: https://pyrcrack.readthedocs.org.
 
 Features
 --------
 
-* TODO
+* Everything works as a context manager
+* Aircrack
+* Wesside
+* Aireplay
+* Airodump
+* Airmon
+* Airdecap
+
 
 Credits
 ---------
