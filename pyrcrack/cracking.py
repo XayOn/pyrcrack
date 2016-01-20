@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 
-    Replay utilities
+    Cracking utilities
     ----------------
 
     This module contains everything related to cracking.
