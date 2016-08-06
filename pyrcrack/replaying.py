@@ -18,7 +18,7 @@ class Aireplay(Air):
     """
 
     _stop = False
-    _allowed_arguments = (
+    _allowed_arguments = [
         ('b', False),
         ('d', False),
         ('s', False),
@@ -39,7 +39,7 @@ class Aireplay(Air):
         ('F', False),
         ('ignore_negative_one', True),
         ('R', False)
-    )
+    ]
 
     _allowed_arguments_fakeauth = (
         ('e', False),
@@ -61,7 +61,13 @@ class Aireplay(Air):
         'deauth', 'fakeauth', 'interactive', 'arpreplay',
         'chopchop', 'fragment', 'caffe_latte', 'cfrag', 'migmode')
 
-    def __init__(self, attack=False, interface=False, **kwargs):
+    def __init__(self, attack=False, interface=False, stdout=None, stderr=None, **kwargs):
+        self.stdout = stdout
+        self.stderr = stderr
+        if not stdout:
+            self.stdout = DEVNULL
+        if not stderr:
+            self.stderr = DEVNULL
         self.interface = interface
 
         if attack not in self._allowed_attacks:
@@ -71,8 +77,9 @@ class Aireplay(Air):
         extra = tuple()
         with suppress(AttributeError):
             extra = getattr(self, "_allowed_arguments_{}".format(attack))
-        self._allowed_arguments = self._allowed_arguments + \
-            extra + (attack, False),
+        if extra:
+            self._allowed_arguments.append(extra)
+        self._allowed_arguments.append((attack, False))
         kwargs[attack] = True
         super(self.__class__, self).__init__(**kwargs)
 
@@ -103,11 +110,13 @@ class Aireplay(Air):
         """
         if not self._stop:
             self._current_execution += 1
-            params = self.flags + self.arguments
+            params = self.arguments
+            if '--deauth' in self.flags:
+                params = ['--deauth', '10'] + self.arguments
             line = ["aireplay-ng"] + params + [self.interface]
             self._proc = Popen(line, bufsize=0,
                                env={'PATH': os.environ['PATH']},
-                               stderr=DEVNULL, stdin=DEVNULL, stdout=DEVNULL)
+                               stderr=self.stderr, stdin=DEVNULL, stdout=self.stdout)
             os.system('stty sane')
 
         time.sleep(5)

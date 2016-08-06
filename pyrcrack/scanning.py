@@ -65,13 +65,20 @@ class Airodump(Air):
         ('netmask', False),
         ('bssid', False),
         ('essid', False),
-        ('output_format', False),
+        ('output-format', False),
         ('write', False),
+        ('channel', False),
         ('essid_regex', False))
 
     def __init__(self, interface=False, **kwargs):
         self.interface = interface
+        self.file_index = False
         super(self.__class__, self).__init__(**kwargs)
+        for name, value in kwargs.items():
+            if name == 'write':
+                self.file_index = 1
+                self._writepath = value
+
 
     @property
     def tree(self):
@@ -131,8 +138,9 @@ class Airodump(Air):
             responsible for duplicates
         """
         self.start()
-        while not os.path.exists(self.curr_csv):
-            time.sleep(5)
+        curr_csv = '{0}.csv'.format(self._writepath)
+        while not os.path.exists(curr_csv):
+            time.sleep(0.5)
 
     def watch_process(self):
         """
@@ -140,8 +148,11 @@ class Airodump(Air):
             This one relaunches airodump eatch time it dies until
             we call stop()
         """
-        psutil.wait_procs([psutil.Process(self._proc.pid)],
+        try:
+            psutil.wait_procs([psutil.Process(self._proc.pid)],
                           callback=self.start)
+        except psutil. NoSuchProcess:
+            pass
 
     def start(self, _=False):
         """
@@ -152,9 +163,9 @@ class Airodump(Air):
         if not self._stop:
             self._current_execution += 1
             flags = self.flags
-            if '--write' not in flags:
+            if '--write' not in self.arguments:
                 flags.extend(['--write', self.writepath])
-            if '--output-format' not in flags:
+            if '--output-format' not in self.arguments:
                 flags.extend(['--output-format', 'csv'])
             line = ["airodump-ng"] + flags + self.arguments + [self.interface]
             self._proc = Popen(line, bufsize=0,
@@ -162,9 +173,9 @@ class Airodump(Air):
                                stderr=DEVNULL, stdin=DEVNULL, stdout=DEVNULL)
             os.system('stty sane')
 
-        time.sleep(5)
-        watcher = threading.Thread(target=self.watch_process)
-        watcher.start()
+        time.sleep(1)
+        self.watcher = threading.Thread(target=self.watch_process)
+        self.watcher.start()
 
     def stop(self):
         """
@@ -173,14 +184,24 @@ class Airodump(Air):
         self._stop = True
         return self._proc.kill()
 
+    def curr_csv(self, curr_csv):
+        return '{filename}-{file_index:02}.csv'.format(filename=curr_csv,file_index=self.file_index)
+
     def update_results(self):
         """
             Updates self.clients and self.aps
         """
         clis = []
         aps = []
-
-        with open(self.curr_csv) as fileo:
+        if self.file_index:
+            curr_csv = self.curr_csv(self._writepath)
+            self.file_index += 1
+            filename = self.curr_csv(self._writepath)
+            if not os.path.exists(filename):
+                self.file_index -= 1
+        while not os.path.exists(curr_csv):
+            sleep(0.1)
+        with open(curr_csv) as fileo:
             file_ = fileo.readlines()
             file_enum = enumerate(file_)
             num = 0
