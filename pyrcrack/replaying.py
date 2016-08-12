@@ -41,21 +41,21 @@ class Aireplay(Air):
         ('R', False)
     ]
 
-    _allowed_arguments_fakeauth = (
+    _allowed_arguments_fakeauth = [
         ('e', False),
         ('o', False),
         ('q', False),
         ('Q', False),
         ('y', False),
         ('T', False)
-    )
-    _allowed_arguments_arpreplay = (
+    ]
+    _allowed_arguments_arpreplay = [
         ('j', False),
-    )
-    _allowed_arguments_fragment = (
+    ]
+    _allowed_arguments_fragment = [
         ('k', False),
         ('l', False)
-    )
+    ]
 
     _allowed_attacks = (
         'deauth', 'fakeauth', 'interactive', 'arpreplay',
@@ -78,7 +78,7 @@ class Aireplay(Air):
         with suppress(AttributeError):
             extra = getattr(self, "_allowed_arguments_{}".format(attack))
         if extra:
-            self._allowed_arguments.append(extra)
+            self._allowed_arguments += extra
         self._allowed_arguments.append((attack, False))
         kwargs[attack] = True
         super(self.__class__, self).__init__(**kwargs)
@@ -113,6 +113,8 @@ class Aireplay(Air):
             params = self.arguments
             if '--deauth' in self.flags:
                 params = ['--deauth', '10'] + self.arguments
+            if '--fakeauth' in self.flags:
+                params = ['--fakeauth', '1'] + self.arguments
             line = ["aireplay-ng"] + params + [self.interface]
             self._proc = Popen(line, bufsize=0,
                                env={'PATH': os.environ['PATH']},
