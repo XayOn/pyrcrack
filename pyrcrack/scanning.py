@@ -200,7 +200,7 @@ class Airodump(Air):
             if not os.path.exists(filename):
                 self.file_index -= 1
         while not os.path.exists(curr_csv):
-            sleep(0.1)
+            time.sleep(0.1)
         with open(curr_csv) as fileo:
             file_ = fileo.readlines()
             file_enum = enumerate(file_)
