@@ -43,13 +43,18 @@ class ExecutorHelper:
         return dict({a.short or a.long: bool(a.argcount) for a in opt})
 
     def run(self, *args, **kwargs):
-        """Check command usage."""
-        opts = docopt.docopt(
-            self.helpstr, args + list(itertools.chain(*kwargs.items())))
+        """Check command usage.
 
+        TODO: handle long options.
+        """
+        args = list(["-{}".format(a) for a in args])
+        kwargs = dict({"-{}".format(a): b for a, b in kwargs.items()})
+        opts = list(itertools.chain(*kwargs.items())) + args
+        opts = docopt.docopt(self.helpstr, opts)
+        opts = [self.command] + list(itertools.chain(*opts.items()))
         if not self.is_async:
-            return subprocess.check_call(opts)
-        return asyncio.create_subprocess_exec(opts)
+            return subprocess.check_call(*opts)
+        return asyncio.create_subprocess_exec(*opts)
 
 
 def stc(command):
