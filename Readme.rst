@@ -10,19 +10,36 @@ pyrcrack
 .. image:: https://badge.fury.io/py/pyrcrack.svg
     :target: https://badge.fury.io/py/pyrcrack
 
-Python aircrack-ng bindingsd
+Python aircrack-ng bindings
 
 
 Usage
 -----
 
-::
+This library exports a basic aircrack-ng API with the following precepts in mind:
 
-    pyrcrack.
+- Be compatible, always.
+- Keep a small codebase
 
-    Python aircrack-ng bindingsd
+This has led to a simple library that executes each of the aircrack-ng's suite commands
+and auto-detects its usage instructions. Based on that, it dinamically builds
+classes inheriting that usage as docstring and a run() method that accepts
+keyword parameters and arguments, and checks them BEFORE trying to run them.
 
-    Usage: pyrcrack [options]
+This can be easily understood as::
+
+        # Run aircrack-ng in quiet mode against foo.cap
+        from pyrcrack import COMMANDS
+
+        cmd = COMMANDS['aircrack-ng']()
+        cmd.run('foo.cap', q='')
+
+
+Or, returning a coroutine::
+
+        cmd = COMMANDS['aircrack-ng']()
+        cmd.is_async = True
+        cmd.run('foo.cap')
 
 
 Distributing

@@ -46,10 +46,14 @@ class ExecutorHelper:
         """Check command usage.
 
         TODO: handle long options.
+        TODO: Replace, in positional args, all spaces in <foo bar>
+              (transform to <foobar>)
+        TODO: Convert arguments after docopt parsing from dict to tuple
+              (i.e "<foobar>": "foo", "<barbaz>": "bar" should be
+              ("foo", "bar")
         """
-        args = list(["-{}".format(a) for a in args])
         kwargs = dict({"-{}".format(a): b for a, b in kwargs.items()})
-        opts = list(itertools.chain(*kwargs.items())) + args
+        opts = tuple(itertools.chain(*kwargs.items())) + args
         opts = docopt.docopt(self.helpstr, opts)
         opts = [self.command] + list(itertools.chain(*opts.items()))
         if not self.is_async:
@@ -67,5 +71,5 @@ CMDS = ('aircrack-ng', 'airodump-ng', 'aireplay-ng', 'airmon-ng', 'wesside-ng',
         'airtun-ng')
 
 
-__ALL__ = {c: type(m, (ExecutorHelper,), {'command': c})
-           for c, m in {command: stc(command) for command in CMDS}.items()}
+COMMANDS = {c: type(m, (ExecutorHelper,), {'command': c})
+            for c, m in {command: stc(command) for command in CMDS}.items()}
