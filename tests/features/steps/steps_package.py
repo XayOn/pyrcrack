@@ -6,9 +6,9 @@ def import_package(context):
     """Try to import the package. If an exception happened push to context."""
     context.exceptions = []
     try:
-        import pyrcrack
+        import pyrcrack  # noqa
     except ImportError as excp:
-        context.exceptions = [excpt]
+        context.exceptions = [excp]
 
 
 @then('I see no errors')
