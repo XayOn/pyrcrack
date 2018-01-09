@@ -1,0 +1,28 @@
+[[source]]
+
+verify_ssl = true
+url = "https://pypi.python.org/simple"
+name = "pypi"
+
+
+[requires]
+
+python_version = "3.7"
+
+
+[packages]
+
+docopt = "*"
+stringcase = "*"
+"pytest-flake8" = "*"
+
+
+[dev-packages]
+
+"flake8" = "*"
+pytest = "*"
+"pytest-flake8" = "*"
+pylint = "*"
+pycodestyle = "*"
+pydocstyle = "*"
+pytest-cov = "*"
