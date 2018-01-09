@@ -5,6 +5,7 @@ python:
 install:
     - pip install tox
     - pip install coveralls
+    - pip install pipenv
 
 script: tox
 
