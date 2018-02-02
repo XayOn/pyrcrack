@@ -16,10 +16,7 @@ Python aircrack-ng bindings
 Usage
 -----
 
-This library exports a basic aircrack-ng API with the following precepts in mind:
-
-- Be compatible, always.
-- Keep a small codebase
+This library exports a basic aircrack-ng API aiming to keep always a small readable codebase.
 
 This has led to a simple library that executes each of the aircrack-ng's suite commands
 and auto-detects its usage instructions. Based on that, it dinamically builds
