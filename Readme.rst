@@ -29,16 +29,16 @@ keyword parameters and arguments, and checks them BEFORE trying to run them.
 This can be easily understood as::
 
         # Run aircrack-ng in quiet mode against foo.cap
-        from pyrcrack import COMMANDS
+        from pyrcrack import AircrackNg
 
-        cmd = COMMANDS['aircrack-ng']()
-        cmd.run('foo.cap', q='')
+        AircrackNg().run('foo.cap', q=True)
 
 
 Or, returning a coroutine::
 
-        cmd = COMMANDS['aircrack-ng']()
-        cmd.is_async = True
+        from pyrcrack import AircrackNg
+        cmd = AircrackNg()
+        cmd.sync = False
         cmd.run('foo.cap')
 
 
