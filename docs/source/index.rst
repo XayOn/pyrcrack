@@ -6,7 +6,9 @@
 Welcome to pyrcrack's documentation!
 ====================================
 
+
 .. toctree::
+   api/modules
    :maxdepth: 2
    :caption: Contents:
 
