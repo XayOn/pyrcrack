@@ -21,9 +21,9 @@ class Airmon(ExecutorHelper):
         return await super().run_async(*args, **kwargs)
 
 
-class AirmonNG(Airmon):
-    """ Airmon-ZC
-    Usage: airmon-zc <start|stop|check> <interface> [channel or frequency]
+class AirmonNg(Airmon):
+    """ Airmon-NG
+    Usage: airmon-ng <start|stop|check> <interface> [channel or frequency]
     """
 
     command = 'airmon-ng'

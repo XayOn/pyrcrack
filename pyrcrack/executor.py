@@ -131,7 +131,7 @@ class ExecutorHelper:
         """Run-and-wait."""
         opts = self._run(*args, **kwargs)
         try:
-            self.proc = subprocess.check_output(opts)
+            return subprocess.check_output(opts)
         except subprocess.CalledProcessError as excp:
             return excp.output
 

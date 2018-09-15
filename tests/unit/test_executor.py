@@ -10,12 +10,13 @@ def test_helpstr_extraction():
     and echo to ensure output 0.
     """
     from unittest.mock import patch
-    with patch("subprocess.check_output", side_effect=(b'test',)) as mock:
+    with patch("subprocess.check_output", side_effect=(b'test', )) as mock:
         from pyrcrack.executor import ExecutorHelper
 
         class FakeExecutor(ExecutorHelper):
             command = "foobar"
-            sync = True
+            requires_tempfile = False
+            requires_tempdir = False
 
         assert FakeExecutor().helpstr == 'test'
         mock.assert_called_with("foobar 2>&1; echo", shell=True)
@@ -26,7 +27,7 @@ def test_usage():
     # opt = docopt.parse_defaults(self.helpstr)
     # return dict({a.short or a.long: bool(a.argcount) for a in opt})
     from unittest.mock import patch
-    with patch("subprocess.check_output", side_effect=(b'test',)):
+    with patch("subprocess.check_output", side_effect=(b'test', )):
         from pyrcrack.executor import ExecutorHelper
 
         class FakeExecutor(ExecutorHelper):
@@ -39,7 +40,9 @@ def test_usage():
             """
 
             command = "foobar"
-            sync = True
+            requires_tempfile = False
+            requires_tempdir = False
+
         assert FakeExecutor().usage == {'-f': False, '-y': True}
 
 
@@ -58,26 +61,28 @@ def test_run():
         """
 
         command = "foobar"
-        sync = True
+        requires_tempfile = False
+        requires_tempdir = False
 
-    with patch("subprocess.check_output", side_effect=(b'test',)) as mock:
-        assert FakeExecutor().run(f=True, y="foo") == b'test'
+    with patch("subprocess.check_output", side_effect=(b'test', )) as mock:
+        assert FakeExecutor().run_sync(f=True, y="foo") == b'test'
         try:
             mock.assert_called_with(['foobar', '-f', '-y', 'foo'])
         except AssertionError:
             mock.assert_called_with(['foobar', '-y', 'foo', '-f'])
 
     import subprocess
-    with patch("subprocess.check_output",
-               side_effect=(subprocess.CalledProcessError(1, "", b"error"),)):
-        assert FakeExecutor().run(f=True, y="foo") == b'error'
+    with patch(
+            "subprocess.check_output",
+            side_effect=(subprocess.CalledProcessError(1, "", b"error"), )):
+        assert FakeExecutor().run_sync(f=True, y="foo") == b'error'
 
 
-def test_run_async():
+async def test_run_async():
     """Check command usage."""
     from unittest.mock import patch
-    with patch("asyncio.create_subprocess_exec",
-               side_effect=(b'test',)) as mock:
+    with patch(
+            "asyncio.create_subprocess_exec", side_effect=(b'test', )) as mock:
         from pyrcrack.executor import ExecutorHelper
 
         class FakeExecutor(ExecutorHelper):
@@ -90,9 +95,10 @@ def test_run_async():
             """
 
             command = "foobar"
-            sync = False
+            requires_tempfile = False
+            requires_tempdir = False
 
-        assert FakeExecutor().run(y=True, f="foo") == b'test'
+        assert (await FakeExecutor().run_async(y=True, f="foo")) == b'test'
         try:
             mock.assert_called_with(['foobar', '-f', 'foo', '-y'])
         except AssertionError:
