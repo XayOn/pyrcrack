@@ -33,7 +33,7 @@ This can be easily understood as::
 
 Or, in async mode with context managers::
 
-    async with pyrcrack.AircrackNg(sync=False) as pcrack:
+    async with pyrcrack.AircrackNg() as pcrack:
         await pcrack.run_async(sys.argv[1])
         # This also sets pcrack.proc as the running
         # process, wich is a `Process` instance.

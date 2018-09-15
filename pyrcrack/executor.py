@@ -7,6 +7,7 @@ import itertools
 import logging
 import subprocess
 import tempfile
+import uuid
 
 import docopt
 import stringcase
@@ -70,6 +71,7 @@ class ExecutorHelper:
         """Set docstring."""
         if not self.__doc__:
             self.__doc__ = self.helpstr
+        self.uuid = uuid.uuid4().hex
         self.logger = logging.getLogger(self.__class__.__name__)
         self.logger.setLevel(logging.DEBUG)
         self.proc = None
