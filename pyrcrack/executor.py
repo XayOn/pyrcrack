@@ -4,8 +4,9 @@ import abc
 import asyncio
 import functools
 import itertools
-import subprocess
 import logging
+import subprocess
+import tempfile
 
 import docopt
 import stringcase
@@ -32,15 +33,14 @@ class Option:
     @functools.lru_cache()
     def formatted(self):
         """Format given option acording to definition."""
-        result = (Option.short(self.word) if self.is_short
-                  else Option.long(self.word))
+        result = (Option.short(self.word)
+                  if self.is_short else Option.long(self.word))
 
         if self.usage.get(result):
             return result
 
         sword = self.word.replace('_', '-')
-        return (Option.short(sword) if self.is_short
-                else Option.long(sword))
+        return Option.short(sword) if self.is_short else Option.long(sword)
 
     @staticmethod
     def long(word):
@@ -57,7 +57,7 @@ class Option:
         """Returns key, value if value is required."""
         if self.expects_args:
             return (self.formatted, str(self.value))
-        return (self.formatted,)
+        return (self.formatted, )
 
     def __repr__(self):
         return f"Option(<{self.parsed}>, {self.is_short}, {self.expects_args})"
@@ -72,9 +72,18 @@ class ExecutorHelper:
             self.__doc__ = self.helpstr
         self.logger = logging.getLogger(self.__class__.__name__)
         self.logger.setLevel(logging.DEBUG)
+        self.proc = None
+        if self.requires_tempfile:
+            self.tempfile = tempfile.NamedTemporaryFile()
+        elif self.requires_tempdir:
+            self.tempdir = tempfile.TemporaryDirectory()
 
     @abc.abstractproperty
-    def sync(self):
+    def requires_tempfile(self):
+        """Synchronous mode."""
+
+    @abc.abstractproperty
+    def requires_tempdir(self):
         """Synchronous mode."""
 
     @abc.abstractproperty
@@ -99,7 +108,7 @@ class ExecutorHelper:
         opt = docopt.parse_defaults(self.__doc__)
         return dict({a.short or a.long: bool(a.argcount) for a in opt})
 
-    def run(self, *args, **kwargs):
+    def _run(self, *args, **kwargs):
         """Check command usage and execute it.
 
         If self.sync is defined, it will return process call output,
@@ -108,20 +117,48 @@ class ExecutorHelper:
         Otherwise it will call asyncio.create_subprocess_exec()
         """
         self.logger.debug("Parsing options: %s", kwargs)
-        options = list(
-            (Option(self.usage, a, v, self.logger) for a, v in kwargs.items()))
+        options = list((Option(self.usage, a, v, self.logger)
+                        for a, v in kwargs.items()))
         self.logger.debug("Got options: %s", options)
 
         opts = [self.command] + list(args) + list(
             itertools.chain(*(o.parsed for o in options)))
 
         self.logger.debug("Running command: %s", opts)
-        if self.sync:
-            try:
-                return subprocess.check_output(opts)
-            except subprocess.CalledProcessError as excp:
-                return excp.output
-        return asyncio.create_subprocess_exec(opts)
+        return opts
+
+    def run_sync(self, *args, **kwargs):
+        """Run-and-wait."""
+        opts = self._run(*args, **kwargs)
+        try:
+            self.proc = subprocess.check_output(opts)
+        except subprocess.CalledProcessError as excp:
+            return excp.output
+
+    async def run_async(self, *args, **kwargs):
+        """Run (as a coroutine)."""
+        opts = self._run(*args, **kwargs)
+        self.proc = await asyncio.create_subprocess_exec(
+            *opts,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
+        return self.proc
+
+    async def __aexit__(self, *args, **kwargs):
+        """Clean up conext manager."""
+        if self.requires_tempfile:
+            self.tempfile.__exit__(*args, **kwargs)
+        elif self.requires_tempdir:
+            self.tempdir.__exit__(*args, **kwargs)
+
+    async def __aenter__(self):
+        """Create temporary directories and files if required."""
+        if self.requires_tempfile:
+            self.tempfile.__enter__()
+        elif self.requires_tempdir:
+            self.tempdir.__enter__()
+        return self
 
 
 def stc(command):

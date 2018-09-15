@@ -1,6 +1,15 @@
 CHANGES
 =======
 
+* Added most aircrack-ng suite commands
+* Compatibility with all versions won't be a thing, sorry
+* Updated readme
+* Added working ExecutorHelper and AircrackNg class
+* Only python3.6 supported right now
+* Added fixmes to pyrcrack main lib and updated readme
+* Added some base tests
+* Added pipenv to travis
+* Fixed readme
 * Initial commit
 * Initial commit
 * Initial commit

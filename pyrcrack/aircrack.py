@@ -1,5 +1,6 @@
 """Aircrack-ng."""
 from .executor import ExecutorHelper
+import tempfile
 
 
 class AircrackNg(ExecutorHelper):
@@ -45,5 +46,20 @@ class AircrackNg(ExecutorHelper):
       -u         : Displays # of CPUs & MMX/SSE support
       --help     : Displays this usage screen
     """
-    sync = True
     command = "aircrack-ng"
+    requires_tempfile = True
+    requires_tempdir = False
+
+    async def run_async(self, *args, **kwargs):
+        if self.tempfile:
+            kwargs['l'] = self.tempfile.name
+        return await super().run_async(*args, **kwargs)
+
+    def run_sync(self, *args, **kwargs):
+        if self.tempfile:
+            kwargs['l'] = self.tempfile.name
+        return super().run(*args, **kwargs)
+
+    async def get_result(self):
+        await self.proc.wait()
+        return self.tempfile.read()

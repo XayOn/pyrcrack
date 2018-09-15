@@ -60,4 +60,5 @@ class AireplayNg(ExecutorHelper):
     """
 
     command = 'aireplay-ng'
-    sync = True
+    requires_tempfile = False
+    requires_tempdir = False

@@ -36,4 +36,5 @@ class AirdecloackNg(ExecutorHelper):
        --help                : Displays this usage screen
     """
     command = "airdecloack-ng"
-    sync = False
+    requires_tempfile = False
+    requires_tempdir = False

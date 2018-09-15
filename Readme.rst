@@ -28,15 +28,21 @@ This can be easily understood as::
         # Run aircrack-ng in quiet mode against foo.cap
         from pyrcrack import AircrackNg
 
-        AircrackNg().run('foo.cap', q=True)
+        AircrackNg().run_sync('foo.cap', q=True)
 
 
-Or, returning a coroutine::
+Or, in async mode with context managers::
 
-        from pyrcrack import AircrackNg
-        cmd = AircrackNg()
-        cmd.sync = False
-        cmd.run('foo.cap')
+    async with pyrcrack.AircrackNg(sync=False) as pcrack:
+        await pcrack.run_async(sys.argv[1])
+        # This also sets pcrack.proc as the running
+        # process, wich is a `Process` instance.
+
+        # get_result() is specific of AircrackNg class.
+        print(await pcrack.get_result())
+
+    # This will create temporary files needed, and
+    # cleanup process after if required.
 
 
 Distributing

@@ -55,4 +55,5 @@ class AirbaseNg(ExecutorHelper):
         --help           : Displays this usage screen
     """
     command = 'airbase-ng'
-    sync = True
+    requires_tempfile = False
+    requires_tempdir = False

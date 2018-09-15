@@ -23,3 +23,5 @@ class AirdecapNg(ExecutorHelper):
 
     command = 'airdecap-ng'
     sync = False
+    requires_tempfile = False
+    requires_tempdir = False
