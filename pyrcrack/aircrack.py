@@ -1,6 +1,5 @@
 """Aircrack-ng."""
 from .executor import ExecutorHelper
-import tempfile
 
 
 class AircrackNg(ExecutorHelper):
