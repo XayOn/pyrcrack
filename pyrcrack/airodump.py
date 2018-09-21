@@ -56,14 +56,8 @@ class AirodumpNg(ExecutorHelper):
     requires_tempdir = True
     command = "airodump-ng"
 
-    async def run_async(self, *args, **kwargs):
+    async def run(self, *args, **kwargs):
         """Run async, with prefix stablished as tempdir."""
         kwargs.pop('w', None)
         kwargs['write'] = self.tempdir.name + "/" + self.uuid
-        return await super().run_async(*args, **kwargs)
-
-    def run_sync(self, *args, **kwargs):
-        """Run sync, with prefix stablished as tempdir."""
-        kwargs.pop('w', None)
-        kwargs['write'] = self.tempdir.name + "/" + self.uuid
-        return super().run_sync(*args, **kwargs)
+        return await super().run(*args, **kwargs)

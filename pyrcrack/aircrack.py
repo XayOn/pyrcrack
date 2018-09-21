@@ -49,15 +49,10 @@ class AircrackNg(ExecutorHelper):
     requires_tempfile = True
     requires_tempdir = False
 
-    async def run_async(self, *args, **kwargs):
+    async def run(self, *args, **kwargs):
         if self.tempfile:
             kwargs['l'] = self.tempfile.name
-        return await super().run_async(*args, **kwargs)
-
-    def run_sync(self, *args, **kwargs):
-        if self.tempfile:
-            kwargs['l'] = self.tempfile.name
-        return super().run(*args, **kwargs)
+        return await super().run(*args, **kwargs)
 
     async def get_result(self):
         await self.proc.wait()

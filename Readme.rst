@@ -23,15 +23,7 @@ and auto-detects its usage instructions. Based on that, it dinamically builds
 classes inheriting that usage as docstring and a run() method that accepts
 keyword parameters and arguments, and checks them BEFORE trying to run them.
 
-This can be easily understood as::
-
-        # Run aircrack-ng in quiet mode against foo.cap
-        from pyrcrack import AircrackNg
-
-        AircrackNg().run_sync('foo.cap', q=True)
-
-
-Or, in async mode with context managers::
+With context managers::
 
     async with pyrcrack.AircrackNg() as pcrack:
         await pcrack.run_async(sys.argv[1])

@@ -46,38 +46,6 @@ def test_usage():
         assert FakeExecutor().usage == {'-f': False, '-y': True}
 
 
-def test_run():
-    """Check command usage."""
-    from unittest.mock import patch
-    from pyrcrack.executor import ExecutorHelper
-
-    class FakeExecutor(ExecutorHelper):
-        """Fake command
-        Usage: Fake [options]
-
-        Options:
-            -f
-            -y=<foo>
-        """
-
-        command = "foobar"
-        requires_tempfile = False
-        requires_tempdir = False
-
-    with patch("subprocess.check_output", side_effect=(b'test', )) as mock:
-        assert FakeExecutor().run_sync(f=True, y="foo") == b'test'
-        try:
-            mock.assert_called_with(['foobar', '-f', '-y', 'foo'])
-        except AssertionError:
-            mock.assert_called_with(['foobar', '-y', 'foo', '-f'])
-
-    import subprocess
-    with patch(
-            "subprocess.check_output",
-            side_effect=(subprocess.CalledProcessError(1, "", b"error"), )):
-        assert FakeExecutor().run_sync(f=True, y="foo") == b'error'
-
-
 async def test_run_async():
     """Check command usage."""
     from unittest.mock import patch
@@ -98,7 +66,7 @@ async def test_run_async():
             requires_tempfile = False
             requires_tempdir = False
 
-        assert (await FakeExecutor().run_async(y=True, f="foo")) == b'test'
+        assert (await FakeExecutor().run(y=True, f="foo")) == b'test'
         try:
             mock.assert_called_with(['foobar', '-f', 'foo', '-y'])
         except AssertionError:

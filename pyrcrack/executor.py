@@ -129,15 +129,7 @@ class ExecutorHelper:
         self.logger.debug("Running command: %s", opts)
         return opts
 
-    def run_sync(self, *args, **kwargs):
-        """Run-and-wait."""
-        opts = self._run(*args, **kwargs)
-        try:
-            return subprocess.check_output(opts)
-        except subprocess.CalledProcessError as excp:
-            return excp.output
-
-    async def run_async(self, *args, **kwargs):
+    async def run(self, *args, **kwargs):
         """Run (as a coroutine)."""
         opts = self._run(*args, **kwargs)
         self.proc = await asyncio.create_subprocess_exec(
