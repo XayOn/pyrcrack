@@ -1,3 +1,8 @@
+"""Aidorump."""
+
+from glob import glob
+import asyncio
+import csv
 from .executor import ExecutorHelper
 
 
@@ -60,4 +65,21 @@ class AirodumpNg(ExecutorHelper):
         """Run async, with prefix stablished as tempdir."""
         kwargs.pop('w', None)
         kwargs['write'] = self.tempdir.name + "/" + self.uuid
+        asyncio.create_task(self.result_updater())
         return await super().run(*args, **kwargs)
+
+    async def result_updater(self):
+        """Set result on local object."""
+        while not self.proc:
+            await asyncio.sleep(1)
+        while self.proc.returncode is None:
+            self.meta['result'] = self.get_results()
+            await asyncio.sleep(2)
+
+    def get_results(self):
+        """Return results at this moment."""
+        filename = glob(self.tempdir.name + "/" + self.uuid + "*.csv")
+        if not filename:
+            return []
+        with open(filename[0]) as fileo:
+            return [dict(a) for a in csv.DictReader(fileo, delimiter=';')]

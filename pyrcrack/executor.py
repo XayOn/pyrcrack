@@ -75,6 +75,7 @@ class ExecutorHelper:
         self.logger = logging.getLogger(self.__class__.__name__)
         self.logger.setLevel(logging.DEBUG)
         self.proc = None
+        self.meta = {}
         if self.requires_tempfile:
             self.tempfile = tempfile.NamedTemporaryFile()
         elif self.requires_tempdir:
