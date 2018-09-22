@@ -26,7 +26,7 @@ keyword parameters and arguments, and checks them BEFORE trying to run them.
 With context managers::
 
     async with pyrcrack.AircrackNg() as pcrack:
-        await pcrack.run_async(sys.argv[1])
+        await pcrack.run(sys.argv[1])
         # This also sets pcrack.proc as the running
         # process, wich is a `Process` instance.
 
@@ -35,6 +35,37 @@ With context managers::
 
     # This will create temporary files needed, and
     # cleanup process after if required.
+
+
+And some sugar, like airodump's result updater::
+
+    import pyrcrack
+    import sys
+    import asyncio
+    from async_timeout import timeout
+
+    async def test(max_timeout):
+        async with pyrcrack.AirodumpNg() as pdump:
+            with suppress(asyncio.TimeoutError):
+                async with timeout(max_timeout):
+                    await pdump.run(sys.argv[1])
+                    while True:
+                        await asyncio.sleep(1)
+                        print(pdump.meta)
+            return await pdump.proc.terminate()
+
+
+    asyncio.run(test(10))
+
+This will automatically keep updating, for 10 seconds, a meta["results"]
+property on pdump.
+
+You can also list all available airmon interfaces, like so::
+
+    async with pyrcrack.AirmonZc() as airmon:
+        print(await airmon.list_wifis())
+
+This will return a nice dict with all information as is returned by airmon-zc
 
 
 Distributing
