@@ -4,9 +4,12 @@ import csv
 from .executor import ExecutorHelper
 
 
-class Airmon(ExecutorHelper):
-    """Base executor for airmon-ng and zc."""
-    command = None
+class AirmonNg(ExecutorHelper):
+    """ Airmon-NG
+    Usage: airmon-ng <start|stop|check> <interface> [channel or frequency]
+    """
+
+    command = 'airmon-ng'
     requires_tempfile = False
     requires_tempdir = False
 
@@ -15,22 +18,6 @@ class Airmon(ExecutorHelper):
         if args:
             assert any(a in args[0] for a in ('start', 'stop', 'check'))
         return await super().run(*args, **kwargs)
-
-
-class AirmonNg(Airmon):
-    """ Airmon-NG
-    Usage: airmon-ng <start|stop|check> <interface> [channel or frequency]
-    """
-
-    command = 'airmon-ng'
-
-
-class AirmonZc(Airmon):
-    """ Airmon-ZC
-    Usage: airmon-nc <start|stop|check> <interface> [channel or frequency]
-    """
-
-    command = 'airmon-zc'
 
     async def list_wifis(self):
         """Return a list of wireless networks as advertised by airmon-zc"""

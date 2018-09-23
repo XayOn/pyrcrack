@@ -3,9 +3,9 @@ from .executor import ExecutorHelper
 
 
 class AirdecapNg(ExecutorHelper):
-    """Airdecap-ng 1.2 beta3 - (C) 2006-2013 Thomas d'Otreppe
+    """Airdecap-ng 1.3  - (C) 2006-2018 Thomas d'Otreppe
 
-    http://www.aircrack-ng.org
+    https://www.aircrack-ng.org
 
     Usage: airdecap-ng [options] <pcap file>
 
@@ -14,11 +14,13 @@ class AirdecapNg(ExecutorHelper):
         -l         : don't remove the 802.11 header
         -b <bssid> : access point MAC address filter
         -e <essid> : target network SSID
+        -o <fname> : output file for decrypted packets (default <src>-dec)
         -w <key>   : target network WEP key in hex
+        -c <fname> : output file for corrupted WEP packets (default <src>-bad)
         -p <pass>  : target network WPA passphrase
         -k <pmk>   : WPA Pairwise Master Key in hex
-
         --help     : Displays this usage screen
+
     """
 
     command = 'airdecap-ng'

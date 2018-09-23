@@ -3,8 +3,8 @@ from .executor import ExecutorHelper
 
 
 class AircrackNg(ExecutorHelper):
-    """ Aircrack-ng 1.2 beta3 - (C) 2006-2013 Thomas d'Otreppe
-  http://www.aircrack-ng.org
+    """ Aircrack-ng - (C) 2006-2018 Thomas d'Otreppe
+  https://www.aircrack-ng.org
 
   Usage: aircrack-ng [options] <file>...
 
@@ -16,7 +16,7 @@ class AircrackNg(ExecutorHelper):
       -p <nbcpu> : # of CPU to use  (default: all CPUs)
       -q         : enable quiet mode (no status output)
       -C <macs>  : merge the given APs to a virtual one
-      -l <file>  : write key to file
+      -l <file>  : write key to file. Overwrites file.
       -c         : search alpha-numeric characters only
       -t         : search binary coded decimal chr only
       -h         : search the numeric key for Fritz!BOX
@@ -38,10 +38,17 @@ class AircrackNg(ExecutorHelper):
       -P <num>   : PTW debug:  1: disable Klein, 2: PTW
       -1         : run only 1 try to crack key with PTW
       -w <words> : path to wordlist(s) filename(s)
+      -N <file>  : path to new session filename
+      -R <file>  : path to existing session filename
       -E <file>  : create EWSA Project file v3
-      -J <file>  : create Hashcat Capture file
+      -j <file>  : create Hashcat v3.6+ file (HCCAPX)
+      -J <file>  : create Hashcat file (HCCAP)
       -S         : WPA cracking speed test
+      -Z <sec>   : WPA cracking speed test length of
+                   execution.
       -r <DB>    : path to airolib-ng database (Cannot be used with -w)
+      --simd-list       : Show a list of the available SIMD architectures
+      --simd=<option>   : Use specific SIMD architecture.
       -u         : Displays # of CPUs & MMX/SSE support
       --help     : Displays this usage screen
     """
@@ -55,5 +62,6 @@ class AircrackNg(ExecutorHelper):
         return await super().run(*args, **kwargs)
 
     async def get_result(self):
+        """Read tempfile (write key result)"""
         await self.proc.wait()
         return self.tempfile.read()

@@ -4,11 +4,10 @@ from .executor import ExecutorHelper
 
 
 class AireplayNg(ExecutorHelper):
-    """
-    Aireplay-ng 1.2 beta3 - (C) 2006-2013 Thomas d'Otreppe
-    http://www.aircrack-ng.org
+    """ Aireplay-ng 1.3  - (C) 2006-2018 Thomas d'Otreppe
+    https://www.aircrack-ng.org
 
-    Usage: aireplay-ng <options> <replay_interface>
+    Usage: aireplay-ng <options> <replay interface>
 
     Options:
 
@@ -44,7 +43,7 @@ class AireplayNg(ExecutorHelper):
         -r file   : extract packets from this pcap file
         -R                    : disable /dev/rtc usage
         --ignore-negative-one : if the interface's channel can't be determined
-                                ignore the mismatch
+        --deauth-rc rc        : Deauthentication reason code [0-254]
         --deauth      count : deauthenticate 1 or all stations (-0)
         --fakeauth    delay : fake authentication with AP (-1)
         --interactive       : interactive frame selection (-2)
@@ -55,7 +54,6 @@ class AireplayNg(ExecutorHelper):
         --cfrag             : fragments against a client  (-7)
         --migmode           : attacks WPA migration mode  (-8)
         --test              : tests injection and quality (-9)
-
         --help              : Displays this usage screen
     """
 
