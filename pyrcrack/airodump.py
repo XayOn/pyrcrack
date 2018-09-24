@@ -1,11 +1,12 @@
 """Aidorump."""
 
-import io
 from glob import glob
 import asyncio
 import csv
+import io
 from contextlib import suppress
 from .executor import ExecutorHelper
+from .models import AccessPoint, Client
 
 
 class AirodumpNg(ExecutorHelper):
@@ -96,26 +97,28 @@ class AirodumpNg(ExecutorHelper):
         """Return results at this moment."""
 
         if not self.csv_file:
-            return []
+            return {'clients': [], 'aps': []}
 
-        res = [[], []]
-        curr = 0
-        for line in open(self.csv_file).readlines():
-            if line.startswith('Station MAC'):
-                curr = 1
-            res[curr].append(line)
+        def clean(name):
+            """Format name."""
+            res = name.strip().lower().replace(' ', '_')
+            return res.replace('#_', '').replace('-', '_')
 
-        results = []
-        for num in range(2):
+        def get_data(line):
             with io.StringIO() as fileo:
-                fileo.write(''.join([a for a in res[num] if a.strip()]))
+                fileo.write(line)
                 fileo.seek(0)
-                reader = csv.DictReader(fileo, delimiter=",")
-                results.append([{
-                    k.strip().lower().replace(' ', '_').replace('#_', ''):
-                    v.strip()
-                    for k, v in a.items()
-                } for a in reader])
-            '\n'.join(res[1])
+                reader = csv.DictReader(fileo, dialect='excel')
+                return [{clean(k): v.strip()
+                         for k, v in line.items()} for line in reader]
 
-        return dict(zip(('aps', 'clients'), results))
+        lines = open(self.csv_file).readlines()
+        inx = lines.index('Station MAC, First time seen, Last time seen,'
+                          ' Power, # packets, BSSID, Probed ESSIDs\n')
+        aps = [a for a in lines[:inx] if a.strip()]
+        clients = [a for a in lines[inx:] if a.strip()]
+
+        return {
+            'aps': [AccessPoint(**d) for d in get_data(''.join(aps))],
+            'clients': [Client(**d) for d in get_data(''.join(clients))]
+        }
