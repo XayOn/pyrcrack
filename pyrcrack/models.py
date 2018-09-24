@@ -5,6 +5,7 @@ from dataclasses import dataclass
 @dataclass
 class AccessPoint:
     """Represents an AP, as outputted by airodump-ng."""
+    clients: dict
     speed: str
     channel: str
     first_time_seen: str

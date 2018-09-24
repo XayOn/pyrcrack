@@ -89,6 +89,7 @@ class AirodumpNg(ExecutorHelper):
 
     @property
     def csv_file(self):
+        """Return csv file, not kismet one."""
         glb = glob(self.tempdir.name + "/" + self.uuid + "-*.csv")
         with suppress(StopIteration):
             return next(a for a in glb if 'kismet' not in a)
@@ -104,21 +105,29 @@ class AirodumpNg(ExecutorHelper):
             res = name.strip().lower().replace(' ', '_')
             return res.replace('#_', '').replace('-', '_')
 
-        def get_data(line):
+        def get_data(content):
+            """Read using a temporary csv file."""
             with io.StringIO() as fileo:
-                fileo.write(line)
+                fileo.write(content)
                 fileo.seek(0)
                 reader = csv.DictReader(fileo, dialect='excel')
                 return [{clean(k): v.strip()
-                         for k, v in line.items()} for line in reader]
+                         for k, v in content.items()} for content in reader]
+
+        def get_clients(apoint, clients):
+            """Get clients for a specific ap."""
+            return [c for c in clients if c.bssid == apoint["bssid"]]
 
         lines = open(self.csv_file).readlines()
         inx = lines.index('Station MAC, First time seen, Last time seen,'
                           ' Power, # packets, BSSID, Probed ESSIDs\n')
-        aps = [a for a in lines[:inx] if a.strip()]
-        clients = [a for a in lines[inx:] if a.strip()]
 
-        return {
-            'aps': [AccessPoint(**d) for d in get_data(''.join(aps))],
-            'clients': [Client(**d) for d in get_data(''.join(clients))]
-        }
+        clients = ''.join([a for a in lines[inx:] if a.strip()])
+        clients = [Client(**d) for d in get_data(''.join(clients))]
+        aps = ''.join([a for a in lines[:inx] if a.strip()])
+        aps = [
+            AccessPoint(**d, clients=get_clients(d, clients))
+            for d in get_data(''.join(aps))
+        ]
+
+        return {'aps': aps, 'clients': clients}
