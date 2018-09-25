@@ -14,8 +14,12 @@ async def scan_for_targets():
         while True:
             await asyncio.sleep(1)
             subprocess.check_call('clear')
-            for apo in pdump.meta['result']['aps']:
-                print(f'{apo.essid} ({apo.bssid}) C: {len(apo.clients)})')
+            for apo in sorted(
+                    pdump.meta['result']['aps'],
+                    key=lambda x: x.score,
+                    reverse=True):
+                print(f'{apo.score} {apo.essid} '
+                      f'({apo.bssid}) C: {len(apo.clients)})')
 
 
 asyncio.run(scan_for_targets())
