@@ -1,4 +1,21 @@
 language: python
+matrix:
+  include:
+    - env: TOXENV=py37
+      python: 3.7
+      sudo: required
+      dist: xenial
+    - env: TOXENV=py37
+      sudo: required
+      dist: xenial
+      addons:
+        apt:
+          sources:
+          - sourceline: 'ppa:deadsnakes/ppa'
+          packages:
+          - python3.7-dev
+
+
 python:
    - '3.7'
 
