@@ -42,10 +42,10 @@ class AireplayNg(ExecutorHelper):
         -i iface  : capture packets from this interface
         -r file   : extract packets from this pcap file
         -R                    : disable /dev/rtc usage
-        --ignore-negative-one : if the interface's channel can't be determined
-        --deauth-rc rc        : Deauthentication reason code [0-254]
-        --deauth      count : deauthenticate 1 or all stations (-0)
-        --fakeauth    delay : fake authentication with AP (-1)
+        --ignore-negative-one  : if the interface's channel can't be determined
+        --deauth-rc <rc>      : Deauthentication reason code [0-254]
+        --deauth <count>    : deauthenticate 1 or all stations (-0)
+        --fakeauth <delay>  : fake authentication with AP (-1)
         --interactive       : interactive frame selection (-2)
         --arpreplay         : standard ARP-request replay (-3)
         --chopchop          : decrypt/chopchop WEP packet (-4)
