@@ -46,11 +46,11 @@ def test_usage():
         assert FakeExecutor().usage == {'-f': False, '-y': True}
 
 
+@pytest.mark.asyncio
 async def test_run_async():
     """Check command usage."""
-    from unittest.mock import patch
-    with patch(
-            "asyncio.create_subprocess_exec", side_effect=(b'test', )) as mock:
+    import asynctest
+    with asynctest.mock.patch("asyncio.create_subprocess_exec") as runmock:
         from pyrcrack.executor import ExecutorHelper
 
         class FakeExecutor(ExecutorHelper):
@@ -66,11 +66,14 @@ async def test_run_async():
             requires_tempfile = False
             requires_tempdir = False
 
-        assert (await FakeExecutor().run(y=True, f="foo")) == b'test'
+        await FakeExecutor().run(f="foo", y=True)
+
         try:
-            mock.assert_called_with(['foobar', '-f', 'foo', '-y'])
+            runmock.assert_called_with(
+                *['foobar', '-f', 'foo', '-y'], stderr=-1, stdin=-1, stdout=-1)
         except AssertionError:
-            mock.assert_called_with(['foobar', '-y', '-f', "foo"])
+            runmock.assert_called_with(
+                *['foobar', '-y', '-f', "foo"], stderr=-1, stdin=-1, stdout=-1)
 
 
 @pytest.mark.parametrize('in_,out', (('aircrack-ng', 'AircrackNg'),

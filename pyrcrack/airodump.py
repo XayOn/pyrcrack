@@ -19,7 +19,7 @@ class AirodumpNg(ExecutorHelper):
            --ivs                 : Save only captured IVs
            --gpsd                : Use GPSd
            --write <prefix>      : Dump file prefix
-           -w                    : same as --write
+           -w <prefix>           : same as --write
            --beacons             : Record all beacons in dump file
            --update <secs>       : Display update delay in seconds
            --showack             : Prints ack/cts/rts statistics
@@ -73,7 +73,7 @@ class AirodumpNg(ExecutorHelper):
 
     async def run(self, *args, **kwargs):
         """Run async, with prefix stablished as tempdir."""
-        if 'write' not in kwargs or 'w' not in kwargs:
+        if not ('write' in kwargs or 'w' in kwargs):
             kwargs.pop('w', None)
             kwargs['write'] = self.tempdir.name + "/" + self.uuid
         asyncio.create_task(self.result_updater())
