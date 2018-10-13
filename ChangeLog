@@ -1,15 +1,50 @@
 CHANGES
 =======
 
+0.1.2
+-----
+
+* Added a few more utilities and examples
+* Fixed TOX
+* Added score
+* Added client list to AP automatically
+* Added models
+* Added scan example
+* Updated to aircrack-ng 1.3
+* Updated readme
+* Added asynchronous result updater for airodump-ng
+* Updated readme
+* Added asynchronous result updater for airodump-ng
+* Removed sync code. Everything is a coroutine now
+* Added airodump
+* Fixed tests
+* Removed unneded tempfile import
+* New API for async and sync requests, added context managers
+* Added documentation
+* Added documentation
+* Fixing readthedocs
+* Fixing readthedocs
+* Added most aircrack-ng suite commands
 * Added most aircrack-ng suite commands
 * Compatibility with all versions won't be a thing, sorry
+* Compatibility with all versions won't be a thing, sorry
+* Updated readme
 * Updated readme
 * Added working ExecutorHelper and AircrackNg class
+* Added working ExecutorHelper and AircrackNg class
+* Only python3.6 supported right now
 * Only python3.6 supported right now
 * Added fixmes to pyrcrack main lib and updated readme
+* Added fixmes to pyrcrack main lib and updated readme
+* Added some base tests
 * Added some base tests
 * Added pipenv to travis
+* Added pipenv to travis
 * Fixed readme
+* Fixed readme
+* Initial commit
+* Initial commit
+* Initial commit
 * Initial commit
 * Initial commit
 * Initial commit
