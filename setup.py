@@ -15,10 +15,10 @@ def update_reqs():
         return
     subprocess.check_call('pipenv lock', shell=True)
     subprocess.check_call(
-        'pipenv lock -r | cut -d\- -f1 > tools/pip-requires',
+        'pipenv lock -r  > tools/pip-requires',
         shell=True)
     subprocess.check_call(
-        'pipenv lock --dev -r |cut -d\- -f1 > tools/test-requires',
+        'pipenv lock --dev -r > tools/test-requires',
         shell=True)
 
 
