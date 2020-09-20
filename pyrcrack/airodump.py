@@ -134,5 +134,6 @@ class AirodumpNg(ExecutorHelper):
 
     def sorted_aps(self):
         """Return sorted aps by score."""
-        return sorted(
-            self.meta['result']['aps'], key=lambda x: x.score, reverse=True)
+        return sorted(self.meta['result']['aps'],
+                      key=lambda x: x.score,
+                      reverse=True)

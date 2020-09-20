@@ -32,8 +32,8 @@ class AccessPoint:
         power_score = -float(self.power) / 100
         dict_score = int(any(a in self.essid for a in DICTS))
         clients_score = len(self.clients)
-        total_score = (beacons_score + enc_score + clients_score + power_score
-                       + dict_score)
+        total_score = (beacons_score + enc_score + clients_score +
+                       power_score + dict_score)
         return round((total_score / 5) * 100)
 
 
