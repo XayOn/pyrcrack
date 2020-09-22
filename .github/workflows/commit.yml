@@ -1,0 +1,27 @@
+name: CI commit
+on: commit
+
+jobs:
+  ci:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.8]
+        poetry-version: [1.0.10]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Run image
+        uses: abatilo/actions-poetry@v2.0.0
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+      - name: Install
+        run: poetry install
+      - name: Run py.test
+        run: poetry run py.test --flake8 -m "not wip" -vv --cov-report html:.cov_html --cov-report term --cov
+      - name: Run behave
+        run: poetry run behave tests/features

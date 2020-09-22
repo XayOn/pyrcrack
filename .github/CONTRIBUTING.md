@@ -1,11 +1,11 @@
-Thank you for contributing pyrcrack
-========================================================
+# Coding styles and coverage
 
-## If you are creating an issue:
+- Yapf with default options must be run before submitting any PR
+- A bug must exist on tracker, and it must be mentioned in each commit in the form \[4\] COMMIT\_MSG
+- Use conventional commits ( https://www.conventionalcommits.org/en/v1.0.0-beta.2/ )
+- You can use emojis on commits
 
-Make sure to report wich specific commit did the issue ocurr on.
-Make sure to run the software on a clean environment.
+# Testing
 
-## If you're creating pull request:
-
-Please, run tox before.
+Make sure you test anything before submitting a PR, and please, do not lower
+the coverage levels

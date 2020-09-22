@@ -1,0 +1,52 @@
+name: Release 
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  ci:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.8]
+        poetry-version: [1.0.10]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Run image
+        uses: abatilo/actions-poetry@v2.0.0
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+      - name: Install
+        run: poetry install
+      - name: Run py.test
+        run: poetry run py.test --flake8 -m "not wip" -vv --cov-report html:.cov_html --cov-report term --cov
+      - name: Run behave
+        run: poetry run behave tests/features
+          name: Create Release
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: ${{github.ref}}
+          draft: false
+          prerelease: false
+      - name: Upload Release Wheel
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dist/pyrcrack-${{github.ref}}-py3-none-any.whl
+          asset_name: pyrcrack-${{github.ref}}-py3-none-any.whl
+          asset_content_type: application/zip

