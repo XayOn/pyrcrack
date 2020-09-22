@@ -28,7 +28,6 @@ jobs:
         run: poetry run py.test --flake8 -m "not wip" -vv --cov-report html:.cov_html --cov-report term --cov
       - name: Run behave
         run: poetry run behave tests/features
-          name: Create Release
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
