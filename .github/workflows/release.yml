@@ -28,6 +28,11 @@ jobs:
         run: poetry run py.test --flake8 -m "not wip" -vv --cov-report term --cov=pyrcrack
       - name: Run behave
         run: poetry run behave tests/features
+      - name: Build
+        run: poetry build
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -35,8 +40,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body: ${{github.ref}}
+          release_name: Release ${{ steps.get_version.outputs.VERSION }}
+          body: ${{ steps.get_version.outputs.VERSION }}
           draft: false
           prerelease: false
       - name: Upload Release Wheel
@@ -46,8 +51,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dist/pyrcrack-${{github.ref}}-py3-none-any.whl
-          asset_name: pyrcrack-${{github.ref}}-py3-none-any.whl
+          asset_path: dist/pyrcrack-${{ steps.get_version.outputs.VERSION }}-py3-none-any.whl
+          asset_name: pyrcrack-${{ steps.get_version.outputs.VERSION }}-py3-none-any.whl
           asset_content_type: application/zip
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
