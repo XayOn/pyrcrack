@@ -1,5 +1,5 @@
-name: CI
-on: pull_request
+name: CI commit
+on: commit
 
 jobs:
   ci:
@@ -25,4 +25,3 @@ jobs:
         run: poetry run --flake8 -m "not wip" -vv --cov-report html:.cov_html --cov-report term --cov
       - name: Run behave
         run: poetry run behave tests/features
-      
