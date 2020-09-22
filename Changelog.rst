@@ -2,15 +2,30 @@ Changelog
 =========
 
 
-(unreleased)
-------------
-- Updated pyproject with license information. [David Francos]
-- Updated readme. [David Francos]
-- Initial aireplay test. [David Francos]
-- Merge branch 'master' of github.com:XayOn/pyrcrack. [David Francos]
-- Removed old pipfile. [David Francos]
-- Fixed test running. [David Francos]
-- Fixed example's PEP8. [David Francos]
+1.0.0 (2020-09-22)
+------------------
+
+Fix
+~~~
+- [#10] Using codecov badge. [David Francos]
+- [#10] Migrating to codecov. [David Francos]
+
+Other
+~~~~~
+- Fixed coveralls. [David Francos]
+- Re-added coveralls and updated readme. [David Francos]
+- Chore: [#9] Fixed workflows. [David Francos]
+- Feature/9 (#10) [David Francos, David Francos]
+
+  * chore: [#9] Fixed badges, build and readme
+
+  - Added new badges to readme, fixed examples and PEP-8 and improved readme
+  itself with markdown.
+  - Updated python to 3.8
+  - Added experimental GH workflows
+  - Added base docs
+  - Added experimental new workflows
+  - Moved directory structure around, removed coveragerc, updated readthedocs config
 - PEP-8. [David Francos]
 - Version bump. [David Francos]
 - Added result helper for aireplay. [David Francos]
