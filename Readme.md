@@ -6,7 +6,7 @@ PyrCrack is a Python API exposing a common aircrack-ng API. As AircrackNg will
 run in background processes, and produce parseable output both in files and
 stdout, the most pythonical approach are context managers, cleaning up after 
 
-<span style="display:block;text-align:center">![](https://img.shields.io/pypi/l/pyrcrack) ![](https://img.shields.io/librariesio/release/pypi/pyrcrack) ![](https://img.shields.io/pypi/dm/pyrcrack) ![](https://img.shields.io/pypi/pyversions/pyrcrack) ![](https://img.shields.io/pypi/v/pyrcrack) ![Coveralls github](https://img.shields.io/coveralls/github/XayOn/pyrcrack) [![Actions Status](https://github.com/XayOn/pyrcrack/workflows/CI%20commit/badge.svg)](https://github.com/XayOn/pyrcrack/actions)</span>
+<span style="display:block;text-align:center">![](https://img.shields.io/pypi/l/pyrcrack) ![](https://img.shields.io/librariesio/release/pypi/pyrcrack) ![](https://img.shields.io/pypi/dm/pyrcrack) ![](https://img.shields.io/pypi/pyversions/pyrcrack) ![](https://img.shields.io/pypi/v/pyrcrack) [![codecov](https://codecov.io/gh/XayOn/pyrcrack/branch/develop/graph/badge.svg)](https://codecov.io/gh/XayOn/pyrcrack) [![Actions Status](https://github.com/XayOn/pyrcrack/workflows/CI%20commit/badge.svg)](https://github.com/XayOn/pyrcrack/actions)</span>
 
 # Installation
 
