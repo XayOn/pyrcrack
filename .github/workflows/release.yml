@@ -49,3 +49,7 @@ jobs:
           asset_path: dist/pyrcrack-${{github.ref}}-py3-none-any.whl
           asset_name: pyrcrack-${{github.ref}}-py3-none-any.whl
           asset_content_type: application/zip
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
