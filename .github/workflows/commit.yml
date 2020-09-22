@@ -25,8 +25,5 @@ jobs:
         run: poetry run py.test --flake8 -m "not wip" -vv --cov-report term --cov-report xml --cov-report annotate --cov=pyrcrack 
       - name: Run behave
         run: poetry run behave tests/features
-      - name: Coveralls
-        uses: coverallsapp/github-action@master
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: .coverage
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
