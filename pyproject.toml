@@ -6,7 +6,7 @@ license = "MIT"
 authors = ["David Francos <opensource@davidfrancos.net>"]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 stringcase = "^1.2"
 docopt = "^0.6.2"
 async-timeout = "^3.0"
