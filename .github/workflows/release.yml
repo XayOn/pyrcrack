@@ -55,9 +55,6 @@ jobs:
           asset_name: pyrcrack-${{ steps.get_version.outputs.VERSION }}-py3-none-any.whl
           asset_content_type: application/zip
       - name: Publish a Python distribution to PyPI
-        uses: pypa/gh-action-pypi-publish@master
-        with:
-          user: xayon
-          password: ${{ secrets.pypi_password }}
+        run: poetry publish --username xayon --password "${{ secrets.pypi_password }}"
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
