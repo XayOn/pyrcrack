@@ -1,9 +1,10 @@
 [tool.poetry]
 name = "pyrcrack"
-version = "1.0.0"
+version = "1.0.1"
 description = "Pythonic aircrack-ng bindings"
 license = "MIT"
 authors = ["David Francos <opensource@davidfrancos.net>"]
+readme = 'Readme.rst'
 
 [tool.poetry.dependencies]
 python = "^3.8"
