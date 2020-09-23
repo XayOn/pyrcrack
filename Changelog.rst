@@ -2,8 +2,17 @@ Changelog
 =========
 
 
-(unreleased)
-------------
+1.0.2 (2020-09-23)
+------------------
+- Merge tag '1.0.1' into develop. [David Francos]
+
+  1.0.1
+
+
+1.0.1 (2020-09-23)
+------------------
+- Merge branch 'release/1.0.1' [David Francos]
+- Version bump to 1.0.1. [David Francos]
 - Fixed twine not passing checks. [David Francos]
 
 
