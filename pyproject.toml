@@ -4,6 +4,7 @@ version = "1.0.0"
 description = "Pythonic aircrack-ng bindings"
 license = "MIT"
 authors = ["David Francos <opensource@davidfrancos.net>"]
+readme = 'Readme.rst'
 
 [tool.poetry.dependencies]
 python = "^3.8"
