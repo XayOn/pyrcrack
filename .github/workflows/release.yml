@@ -25,7 +25,7 @@ jobs:
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
       - name: Get prev version
         id: prev_version
-        run: echo ::set-output name=PREV_VERSION::$(git describe --abbrev=${{steps.get_version.outputs.VERSION}})
+        run: echo ::set-output name=PREV_VERSION::$(git describe --abbrev=0 ${{steps.get_version.outputs.VERSION}})
       - name: Get Changelog 
         id: changelog 
         run: echo ::set-output name=CHANGELOG::$(gitchangelog ${{steps.get_version.outputs.VERSION}}..${{steps.prev_version.outputs.PREV_VERSION}})
