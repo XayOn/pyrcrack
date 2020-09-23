@@ -2,7 +2,12 @@ Changelog
 =========
 
 
-1.0.0 (2020-09-22)
+(unreleased)
+------------
+- Fixed twine not passing checks. [David Francos]
+
+
+1.0.0 (2020-09-23)
 ------------------
 
 Fix
@@ -12,6 +17,17 @@ Fix
 
 Other
 ~~~~~
+- Trying to get gitchangelog to get release info. [David Francos]
+- Last try on release for today. [David Francos]
+- Feat: closes: #11 Added pypi to github flow. [David Francos]
+- Merge branch 'master' into develop. [David Francos]
+- Added build step. [David Francos]
+- Fixed release build. [David Francos]
+- Merge tag '1.0.0' into develop. [David Francos]
+
+  1.0.0
+- Merge branch 'release/1.0.0' [David Francos]
+- Version bump to 1.0.0. [David Francos]
 - Fixed coveralls. [David Francos]
 - Re-added coveralls and updated readme. [David Francos]
 - Chore: [#9] Fixed workflows. [David Francos]
