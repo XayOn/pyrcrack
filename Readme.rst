@@ -24,7 +24,7 @@ Installation
 
 This library is available on `Pypi <https://pypi.org/project/pyrcrack/>`_, you can install it directly with pip::
 
-        pip install pycrack
+        pip install pyrcrack
 
 Usage
 -----
