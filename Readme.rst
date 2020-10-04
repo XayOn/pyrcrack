@@ -49,32 +49,22 @@ You can find some example usages in examples/ directory::
     # This will create temporary files needed, and
     # cleanup process after if required.
 
-There are some syntactic sugar methods, like "result_updater" on pyrcrack class.
 
-The following example will automatically keep updating, for 10 seconds, a
-meta["results"] property on pdump::
+Some classes expose themselves as async iterators, as airodump-ng's wich
+returns access points with its associated clients.
 
-    import pyrcrack
-    import sys
-    import asyncio
-    from async_timeout import timeout
+The following example will automatically keep printing results each 2 seconds::
 
-    async def test(max_timeout):
-        async with pyrcrack.AirodumpNg() as pdump:
-            with suppress(asyncio.TimeoutError):
-                async with timeout(max_timeout):
-                    await pdump.run(sys.argv[1])
-                    while True:
-                        await asyncio.sleep(1)
-                        print(pdump.meta)
-            return await pdump.proc.terminate()
-
-
-    asyncio.run(test(10))
+        async def scan_for_targets():
+            """Scan for targets, return json."""
+            async with pyrcrack.AirodumpNg() as pdump:
+                async for result in pdump(sys.argv[1]):
+                    console.print(result)
+                    await asyncio.sleep(2)
 
 You can also list all available airmon interfaces, like so::
 
-    async with pyrcrack.AirmonZc() as airmon:
+    async with pyrcrack.AirmonNg() as airmon:
         print(await airmon.list_wifis())
 
-This will return a nice dict with all information as is returned by airmon-zc
+This will return a nice dict with all information as is returned by airmon-ng
