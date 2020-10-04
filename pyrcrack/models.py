@@ -1,5 +1,7 @@
 from rich.table import Table
 
+DICTS = ('WLAN_', 'JAZZTEL_', 'MOVISTAR_')
+
 
 class Result(list):
     @property
@@ -38,7 +40,7 @@ class Client:
 
 class AccessPoint:
     """Represents an access point.
-    
+
     Stores internal data in "data" property
     """
     def __init__(self, data):
@@ -96,7 +98,7 @@ class AccessPoint:
         dbm_score = -int(self.dbm)
         dict_score = bool(any(self.essid.startswith(a) for a in DICTS))
         name_score = -1000 if not self.essid else 0
-        return packet_score + dbm_score + dict_score
+        return packet_score + dbm_score + dict_score + name_score
 
     @property
     def packets(self):

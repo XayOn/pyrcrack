@@ -21,8 +21,8 @@ def check():
 
 class Pyrcrack:
     """High level aircrack-ng interface.
-    
-    Arguments: 
+
+    Arguments:
 
         list_waiting_time: Time (in seconds) to wait for a network scan
     """
@@ -41,7 +41,7 @@ class Pyrcrack:
 
         Returns: None
         """
-        return [a['interface'] for a in await airmon.list_wifis()]
+        return [a['interface'] for a in await AirmonNg().list_wifis()]
 
     async def set_interface(self, interface):
         """Select an interface, set it on monitor mode
@@ -57,13 +57,12 @@ class Pyrcrack:
     async def access_points(self) -> list:
         """Return a list of access points by scanning with airodump-ng
 
-        This is a basic, hihg-level scan, on all channels without extra
-        options, for more custom searches uses directly the AirodumpNg async
-        context manager.
+        This is a basic, hihg-level scan, for 10 seconds, on all channels
+        without extra options, for more custom searches uses directly the
+        AirodumpNg async context manager.
 
-        Returns: List of `AccessPoint` instances
+        Returns: List `AccessPoint` instances
         """
         async with AirodumpNg() as pdump:
-            await pdump.run(self.iface, write_interval=1)
-            await asyncio.sleep(self.list_waiting_time)
-            return pdump.sorted_aps()
+            asyncio.sleep(10)
+            return [a async for a in pdump(self.iface)]

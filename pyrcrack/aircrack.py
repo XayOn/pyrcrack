@@ -52,7 +52,7 @@ class AircrackNg(ExecutorHelper):
       --simd-list       : Show a list of the available
       --simd <option>   : Use specific SIMD architecture.
       -u         : Displays # of CPUs & SIMD support
-      --help     : Displays this usage screen 
+      --help     : Displays this usage screen
     """
     command = "aircrack-ng"
     requires_tempfile = True

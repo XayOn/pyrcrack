@@ -1,10 +1,7 @@
 """Airodump."""
 
 import os
-from glob import glob
 import asyncio
-import csv
-import io
 import xml
 from contextlib import suppress
 from .executor import ExecutorHelper
@@ -14,10 +11,7 @@ import xmltodict
 import dotmap
 
 from .models import Result
-from .models import Client
 from .models import AccessPoint
-
-DICTS = ('WLAN_', 'JAZZTEL_', 'MOVISTAR_')
 
 
 class AirodumpNg(ExecutorHelper):
@@ -30,7 +24,7 @@ class AirodumpNg(ExecutorHelper):
            --ivs                 : Save only captured IVs
            --gpsd                : Use GPSd
            --write <prefix>      : Dump file prefix
-           -w                    : same as --write
+           -w <prefix>           : same as --write
            --beacons             : Record all beacons in dump file
            --update <secs>       : Display update delay in seconds
            --showack             : Prints ack/cts/rts statistics
@@ -52,7 +46,8 @@ class AirodumpNg(ExecutorHelper):
                                        logcsv
            --ignore-negative-one : Removes the message that says
                                    fixed channel <interface>: -1
-           --write-interval <seconds> : Output file(s) write interval in seconds
+           --write-interval <seconds> : Output file(s) write interval in
+                                        seconds
            --background <enable> : Override background detection.
            -n <int>              : Minimum AP packets recv'd before for
                                    displaying it
@@ -108,7 +103,7 @@ class AirodumpNg(ExecutorHelper):
         if not ('write' in kwargs or 'w' in kwargs):
             kwargs.pop('w', None)
             kwargs['write'] = self.tempdir.name + "/" + self.uuid
-        if not 'write_interval' in kwargs:
+        if 'write_interval' not in kwargs:
             kwargs['write_interval'] = 1
 
         # Ensure kismet xml is going to be written
@@ -117,6 +112,7 @@ class AirodumpNg(ExecutorHelper):
         elif kwargs.get('write-format') and 'kismet' not in kwargs.get(
                 'write-format', ''):
             kwargs['write-format'] += ',kismet'
+        print(kwargs)
 
         return await super().run(*args, **kwargs)
 
@@ -127,7 +123,7 @@ class AirodumpNg(ExecutorHelper):
     def get_file(self, format) -> str:
         """Return csv file, not kismet one.
 
-        Arguments: 
+        Arguments:
 
             format: File extension to retrieve (kismet.csv kismet.xml csv
                     log.csv or pcap)
@@ -139,7 +135,7 @@ class AirodumpNg(ExecutorHelper):
     @property
     async def results(self) -> list:
         """Return a list of currently detected access points
-        
+
         Returns: List of AccessPoint instances
         """
         file = self.get_file('kismet.netxml')
