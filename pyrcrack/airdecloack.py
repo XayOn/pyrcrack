@@ -4,7 +4,7 @@ from .executor import ExecutorHelper
 
 
 class AirdecloackNg(ExecutorHelper):
-    """ Airdecloak-ng 1.3  - (C) 2008-2018 Thomas d'Otreppe
+    """ Airdecloak-ng 1.6  - (C) 2008-2020 Thomas d'Otreppe
     https://www.aircrack-ng.org
     Available filters::
 
