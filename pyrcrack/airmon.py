@@ -1,4 +1,4 @@
-"""Airmon-ng and zc."""
+"""Airmon-ng"""
 import io
 import csv
 from .executor import ExecutorHelper
