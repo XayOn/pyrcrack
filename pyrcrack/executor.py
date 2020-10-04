@@ -70,6 +70,7 @@ class ExecutorHelper:
         if not self.__doc__:
             self.__doc__ = self.helpstr
         self.uuid = uuid.uuid4().hex
+        self.execn = 0
         self.logger = logging.getLogger(self.__class__.__name__)
         self.logger.setLevel(logging.DEBUG)
         self.proc = None
@@ -129,7 +130,7 @@ class ExecutorHelper:
         return opts
 
     async def run(self, *args, **kwargs):
-        """Run (as a coroutine)."""
+        """Run asynchronously."""
         opts = self._run(*args, **kwargs)
         self.proc = await asyncio.create_subprocess_exec(
             *opts,

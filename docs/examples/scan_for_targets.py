@@ -1,22 +1,26 @@
 """Scan for targets and and pretty print some data."""
-import sys
-import subprocess
 import asyncio
+import sys
 
 import pyrcrack
+
+from rich.console import Console
 
 
 async def scan_for_targets():
     """Scan for targets, return json."""
-
+    console = Console()
+    console.clear()
+    console.show_cursor(False)
     async with pyrcrack.AirodumpNg() as pdump:
-        await pdump.run(sys.argv[1], write_interval=1)
-        while True:
-            await asyncio.sleep(1)
-            subprocess.check_call('clear')
-            for apo in pdump.sorted_aps():
-                print(f'{apo.score} {apo.essid} '
-                      f'({apo.bssid}) C: {len(apo.clients)})')
+        async for result in pdump(sys.argv[1]):
+            # Current running process will be stored in self.proc
+            # Be careful, the process will only start when you iter trough
+            # results. A simple await anext(pdump(...)) would do if you don't
+            # reallywant to gather results.
+            console.clear()
+            console.print(result.table)
+            await asyncio.sleep(2)
 
 
 asyncio.run(scan_for_targets())
