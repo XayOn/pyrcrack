@@ -3,7 +3,7 @@ from .executor import ExecutorHelper
 
 
 class AircrackNg(ExecutorHelper):
-    """ Aircrack-ng - (C) 2006-2018 Thomas d'Otreppe
+    """ Aircrack-ng 1.6  - (C) 2006-2020 Thomas d'Otreppe
   https://www.aircrack-ng.org
 
   Usage: aircrack-ng [options] <file>...
@@ -37,20 +37,22 @@ class AircrackNg(ExecutorHelper):
       -D         : WEP decloak, skips broken keystreams
       -P <num>   : PTW debug:  1: disable Klein, 2: PTW
       -1         : run only 1 try to crack key with PTW
+      -V         : run in visual inspection mode
       -w <words> : path to wordlist(s) filename(s)
       -N <file>  : path to new session filename
       -R <file>  : path to existing session filename
       -E <file>  : create EWSA Project file v3
+      -I <str>   : PMKID string (hashcat -m 16800)
       -j <file>  : create Hashcat v3.6+ file (HCCAPX)
       -J <file>  : create Hashcat file (HCCAP)
       -S         : WPA cracking speed test
       -Z <sec>   : WPA cracking speed test length of
                    execution.
-      -r <DB>    : path to airolib-ng database (Cannot be used with -w)
-      --simd-list       : Show a list of the available SIMD architectures
-      --simd=<option>   : Use specific SIMD architecture.
-      -u         : Displays # of CPUs & MMX/SSE support
-      --help     : Displays this usage screen
+      -r <DB>    : path to airolib-ng database
+      --simd-list       : Show a list of the available
+      --simd <option>   : Use specific SIMD architecture.
+      -u         : Displays # of CPUs & SIMD support
+      --help     : Displays this usage screen 
     """
     command = "aircrack-ng"
     requires_tempfile = True

@@ -3,7 +3,7 @@ from .executor import ExecutorHelper
 
 
 class AirdecapNg(ExecutorHelper):
-    """Airdecap-ng 1.3  - (C) 2006-2018 Thomas d'Otreppe
+    """Airdecap-ng 1.6  - (C) 2006-2020 Thomas d'Otreppe
 
     https://www.aircrack-ng.org
 
