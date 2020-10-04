@@ -7,7 +7,7 @@ from .executor import ExecutorHelper
 
 
 class AireplayNg(ExecutorHelper):
-    """ Aireplay-ng 1.3  - (C) 2006-2018 Thomas d'Otreppe
+    """ Aireplay-ng 1.6  - (C) 2006-2020 Thomas d'Otreppe
     https://www.aircrack-ng.org
 
     Usage: aireplay-ng <options> <replay interface>

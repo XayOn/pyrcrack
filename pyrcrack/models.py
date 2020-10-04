@@ -1,49 +1,115 @@
-"""Models."""
-from dataclasses import dataclass
+from rich.table import Table
 
-DICTS = ('WLAN_', 'JAZZTEL', 'Movistar', 'movistar', 'MOVISTAR')
+DICTS = ('WLAN_', 'JAZZTEL_', 'MOVISTAR_')
 
 
-@dataclass
+class Result(list):
+    @property
+    def table(self):
+        """Return a nicely formatted table with results."""
+        table = Table(show_header=True,
+                      header_style='bold magenta',
+                      show_footer=False)
+        if self:
+            keys = self[0].asdict().keys()
+            for key in keys:
+                table.add_column(key.capitalize())
+
+            for res in self:
+                res = res.asdict()
+                table.add_row(*[res[k] for k in keys])
+        return table
+
+
+class Client:
+    def __init__(self, data):
+        self.data = data
+
+    @property
+    def bssid(self):
+        return self.data['client-mac']
+
+    @property
+    def packets(self):
+        return self.data.packets.total
+
+    @property
+    def dbm(self):
+        return self.data['snr-info'].last_signal_dbm
+
+
 class AccessPoint:
-    """Represents an AP, as outputted by airodump-ng."""
-    clients: dict
-    speed: str
-    channel: str
-    first_time_seen: str
-    beacons: str
-    lan_ip: str
-    essid: str
-    last_time_seen: str
-    privacy: str
-    key: str
-    iv: str
-    cipher: str
-    authentication: str
-    power: str
-    bssid: str
-    id_length: str
+    """Represents an access point.
+
+    Stores internal data in "data" property
+    """
+    def __init__(self, data):
+        """Initialize an access point
+
+        Arguments:
+
+            data: Dot data structure from kismet xml file.
+        """
+        self.data = data
+
+    def __repr__(self):
+        return f"{self.essid} - ({self.bssid})"
+
+    @property
+    def clients(self):
+        """List of connected clients.
+
+        Returns:
+
+            List of Client instance.
+        """
+        if isinstance(self.data['wireless-client'], list):
+            return [Client(d) for d in self.data['wireless-client']]
+        else:
+            return [Client(self.data['wireless-client'])]
+
+    def asdict(self):
+        return {
+            'essid': self.essid,
+            'bssid': self.bssid,
+            'packets': str(self.packets.total),
+            'dbm': str(self.dbm),
+            'score': str(self.score)
+        }
+
+    @property
+    def essid(self):
+        """Essid"""
+        return self.data.SSID.essid.get('#text', '')
+
+    @property
+    def bssid(self):
+        """Mac (BSSID)"""
+        return self.data.BSSID
 
     @property
     def score(self):
-        """**Kinda-hackability** orientative score"""
-        beacons_score = int(self.iv) / 1000 if int(self.iv) < 1000 else 1
-        enc_score = {'WEP': 1, 'WPA2': 0.3, 'WPA': 0.3}.get(self.cipher, 0)
-        power_score = -float(self.power) / 100
-        dict_score = int(any(a in self.essid for a in DICTS))
-        clients_score = len(self.clients)
-        total_score = (beacons_score + enc_score + clients_score +
-                       power_score + dict_score)
-        return round((total_score / 5) * 100)
+        """Score, used to sort networks.
 
+        Score will take in account the total packets received, the dbm and if a
+        ssid is susceptible to have dictionaries.
+        """
+        packet_score = int(self.packets.total)
+        dbm_score = -int(self.dbm)
+        dict_score = bool(any(self.essid.startswith(a) for a in DICTS))
+        name_score = -1000 if not self.essid else 0
+        return packet_score + dbm_score + dict_score + name_score
 
-@dataclass
-class Client:
-    """Represents a client."""
-    probed_essids: str
-    first_time_seen: str
-    power: str
-    bssid: str
-    station_mac: str
-    last_time_seen: str
-    packets: str
+    @property
+    def packets(self):
+        """Return list of packets."""
+        return self.data.packets
+
+    @property
+    def dbm(self):
+        """Return dbm info"""
+        return self.data['snr-info'].last_signal_dbm
+
+    def __lt__(self, other):
+        """Compare with score."""
+        return self.score
