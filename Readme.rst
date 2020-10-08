@@ -29,42 +29,51 @@ This library is available on `Pypi <https://pypi.org/project/pyrcrack/>`_, you c
 Usage
 -----
 
-This library exports a basic aircrack-ng API aiming to keep always a small readable codebase.
+This library exports a basic aircrack-ng API aiming to keep always a small
+readable codebase.
 
 This has led to a simple library that executes each of the aircrack-ng's suite commands
 and auto-detects its usage instructions. Based on that, it dinamically builds
 classes inheriting that usage as docstring and a run() method that accepts
 keyword parameters and arguments, and checks them BEFORE trying to run them.
 
-You can find some example usages in examples/ directory::
-
-    async with pyrcrack.AircrackNg() as pcrack:
-        await pcrack.run(sys.argv[1])
-        # This also sets pcrack.proc as the running
-        # process, wich is a `Process` instance.
-
-        # get_result() is specific of AircrackNg class.
-        print(await pcrack.get_result())
-
-    # This will create temporary files needed, and
-    # cleanup process after if required.
-
-
 Some classes expose themselves as async iterators, as airodump-ng's wich
 returns access points with its associated clients.
 
-The following example will automatically keep printing results each 2 seconds::
+You can have a look at the examples/ folder for some usage examples, such as
+the basic "scan for targets", that will list available interfaces, let you
+choose one, put it in monitor mode, and scan for targets updating results each
+2 seconds.
+
+.. code:: python
+
+        import asyncio
+
+        import pyrcrack
+
+        from rich.console import Console
+        from rich.prompt import Prompt
+
 
         async def scan_for_targets():
             """Scan for targets, return json."""
-            async with pyrcrack.AirodumpNg() as pdump:
-                async for result in pdump(sys.argv[1]):
-                    console.print(result)
-                    await asyncio.sleep(2)
+            console = Console()
+            console.clear()
+            console.show_cursor(False)
+            airmon = pyrcrack.AirmonNg()
 
-You can also list all available airmon interfaces, like so::
+            interface = Prompt.ask(
+                'Select an interface',
+                choices=[a['interface'] for a in await airmon.interfaces])
 
-    async with pyrcrack.AirmonNg() as airmon:
-        print(await airmon.list_wifis())
+            async with airmon(interface) as mon:
+                async with pyrcrack.AirodumpNg() as pdump:
+                    async for result in pdump(mon.monitor_interface):
+                        console.clear()
+                        console.print(result.table)
+                        await asyncio.sleep(2)
 
-This will return a nice dict with all information as is returned by airmon-ng
+
+        asyncio.run(scan_for_targets())
+
+.. image:: https://raw.githubusercontent.com/XayOn/pyrcrack/master/docs/scan.png
