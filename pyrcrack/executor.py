@@ -73,7 +73,6 @@ class ExecutorHelper:
         self.called = False
         self.execn = 0
         self.logger = logging.getLogger(self.__class__.__name__)
-        self.logger.setLevel(logging.DEBUG)
         self.proc = None
         self.meta = {}
         if self.requires_tempfile:
