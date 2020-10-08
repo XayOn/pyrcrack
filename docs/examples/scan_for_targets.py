@@ -1,22 +1,28 @@
 """Scan for targets and and pretty print some data."""
-import sys
-import subprocess
 import asyncio
 
 import pyrcrack
 
+from rich.console import Console
+from rich.prompt import Prompt
+
 
 async def scan_for_targets():
     """Scan for targets, return json."""
+    console = Console()
+    console.clear()
+    console.show_cursor(False)
+    airmon = pyrcrack.AirmonNg()
 
-    async with pyrcrack.AirodumpNg() as pdump:
-        await pdump.run(sys.argv[1], write_interval=1)
-        while True:
-            await asyncio.sleep(1)
-            subprocess.check_call('clear')
-            for apo in pdump.sorted_aps():
-                print(f'{apo.score} {apo.essid} '
-                      f'({apo.bssid}) C: {len(apo.clients)})')
+    interface = Prompt.ask(
+        'Select an interface',
+        choices=[a['interface'] for a in await airmon.interfaces])
+    async with airmon(interface) as mon:
+        async with pyrcrack.AirodumpNg() as pdump:
+            async for result in pdump(mon.monitor_interface):
+                console.clear()
+                console.print(result.table)
+                await asyncio.sleep(2)
 
 
 asyncio.run(scan_for_targets())

@@ -15,4 +15,4 @@ from .airodump import AirodumpNg  # noqa
 
 def check():
     """Check if aircrack-ng is compatible."""
-    assert '1.3' in subprocess.check_output(['aircrack-ng', '-v'])
+    assert '1.6' in subprocess.check_output(['aircrack-ng', '-v'])
