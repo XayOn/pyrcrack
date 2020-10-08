@@ -72,30 +72,6 @@ class AirodumpNg(ExecutorHelper):
     requires_tempdir = True
     command = "airodump-ng"
 
-    def __init__(self, *args, **kwargs):
-        self.called = False
-        self.proc = None
-        super().__init__(*args, **kwargs)
-
-    def __call__(self, *args, **kwargs):
-        self.run_args = args, kwargs
-        return self
-
-    def __aiter__(self):
-        """Defines us as an async iterator."""
-        return self
-
-    async def __anext__(self):
-        """Get the next result batch."""
-        if not self.called:
-            self.called = True
-            self.proc = await self.run(*self.run_args[0], **self.run_args[1])
-
-        if not self.running:
-            raise StopAsyncIteration
-
-        return await self.results
-
     async def run(self, *args, **kwargs):
         """Run async, with prefix stablished as tempdir."""
         self.execn += 1
@@ -116,9 +92,6 @@ class AirodumpNg(ExecutorHelper):
 
         return await super().run(*args, **kwargs)
 
-    @property
-    def running(self):
-        return self.proc.returncode is None
 
     def get_file(self, format) -> str:
         """Return csv file, not kismet one.
@@ -140,17 +113,21 @@ class AirodumpNg(ExecutorHelper):
         """
         file = self.get_file('kismet.netxml')
         try:
+            # Wait for a sensible 3 seconds for netxml file to be generated and
+            # process to be running
             async with timeout(3):
                 while not os.path.exists(file):
                     await asyncio.sleep(1)
 
                 while not self.proc:
+                    # Check if airodump is running, otherwise wait more. 
                     await asyncio.sleep(1)
         except asyncio.exceptions.TimeoutError:
+            # No file had been generated or process hadn't started in 3 seconds.
             raise Exception(await self.proc.communicate())
 
         while self.running:
-            # Update results each second.
+            # Avoid crashing on file creation
             with suppress(ValueError, xml.parsers.expat.ExpatError):
                 xmla = xmltodict.parse(open(file).read())
                 dotmap_data = dotmap.DotMap(xmla)

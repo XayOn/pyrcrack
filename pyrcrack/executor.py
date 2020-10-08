@@ -70,6 +70,7 @@ class ExecutorHelper:
         if not self.__doc__:
             self.__doc__ = self.helpstr
         self.uuid = uuid.uuid4().hex
+        self.called = False
         self.execn = 0
         self.logger = logging.getLogger(self.__class__.__name__)
         self.logger.setLevel(logging.DEBUG)
@@ -138,6 +139,33 @@ class ExecutorHelper:
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
         return self.proc
+
+    def __call__(self, *args, **kwargs):
+        self.run_args = args, kwargs
+        return self
+
+    def __aiter__(self):
+        """Defines us as an async iterator."""
+        return self
+
+    async def __anext__(self):
+        """Get the next result batch."""
+        if not self.called:
+            self.called = True
+            self.proc = await self.run(*self.run_args[0], **self.run_args[1])
+
+        if not self.running:
+            raise StopAsyncIteration
+
+        return await self.results
+
+    @property
+    def running(self):
+        return self.proc.returncode is None
+
+    @property
+    async def results(self):
+        return [self.proc]
 
     async def __aexit__(self, *args, **kwargs):
         """Clean up conext manager."""
