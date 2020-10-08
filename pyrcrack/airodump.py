@@ -91,7 +91,6 @@ class AirodumpNg(ExecutorHelper):
 
         return await super().run(*args, **kwargs)
 
-
     def get_file(self, format) -> str:
         """Return csv file, not kismet one.
 
@@ -119,10 +118,11 @@ class AirodumpNg(ExecutorHelper):
                     await asyncio.sleep(1)
 
                 while not self.proc:
-                    # Check if airodump is running, otherwise wait more. 
+                    # Check if airodump is running, otherwise wait more.
                     await asyncio.sleep(1)
         except asyncio.exceptions.TimeoutError:
-            # No file had been generated or process hadn't started in 3 seconds.
+            # No file had been generated or process hadn't started in 3
+            # seconds.
             raise Exception(await self.proc.communicate())
 
         while self.running:

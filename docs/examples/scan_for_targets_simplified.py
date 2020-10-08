@@ -1,6 +1,5 @@
 """Scan for targets and and pretty print some data."""
 import asyncio
-import sys
 
 import pyrcrack
 
@@ -20,7 +19,6 @@ async def scan_for_targets():
     await pyrc.set_interface(interface)
     aps = await pyrc.access_points
     console.print(aps.table)
-    
 
 
 asyncio.run(scan_for_targets())
