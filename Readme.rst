@@ -76,4 +76,6 @@ choose one, put it in monitor mode, and scan for targets updating results each
 
         asyncio.run(scan_for_targets())
 
+This snippet of code will produce the following results:
+
 .. image:: https://raw.githubusercontent.com/XayOn/pyrcrack/master/docs/scan.png
