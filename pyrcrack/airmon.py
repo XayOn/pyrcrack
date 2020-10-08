@@ -1,7 +1,11 @@
 """Airmon-ng"""
 import io
 import csv
+import re
 from .executor import ExecutorHelper
+
+MONITOR_RE = re.compile(
+    '\t\t\((\w+) (\w+) mode vif (\w+) for \[\w+\](\w+) on \[\w+\](\w+)\)')
 
 
 class AirmonNg(ExecutorHelper):
@@ -31,9 +35,25 @@ class AirmonNg(ExecutorHelper):
     async def set_monitor(self, wifi, *args):
         """Set monitor mode interface"""
         await self.run('start', wifi, *args)
-        res = (await self.proc.communicate())[0].split(b'\n')
+        res = [a for a in (await self.proc.communicate())[0].split(b'\n') if a]
         pos = res.index(b'PHY	Interface	Driver		Chipset')
-        return self.parse(b'\n'.join([a for a in res[pos:] if a]))
+        ifaces_data = self.parse(b'\n'.join(
+            [a for a in res[pos:] if a and not a.startswith(b'\t\t')]))
+        ifaces = {k['interface']: k for k in ifaces_data}
+        keys = [
+            'driver', 'mode', 'status', 'original_interface',
+            'interface'
+        ]
+        monitor_lines = res[pos + len(ifaces_data) + 1:]
+        monitor_data = (
+            dict(zip(keys,
+                     MONITOR_RE.match(a.decode()).groups()))
+            for a in monitor_lines if MONITOR_RE.match(a.decode())
+        )
+        for data in monitor_data:
+            ifaces[data['original_interface']][data['mode']] = data
+
+        return ifaces_data
 
     async def list_wifis(self):
         """Return a list of wireless networks as advertised by airmon-zc"""
