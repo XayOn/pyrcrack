@@ -26,10 +26,9 @@ class Pyrcrack:
 
         list_waiting_time: Time (in seconds) to wait for a network scan
     """
-    def __init__(self, list_waiting_time):
+    def __init__(self):
         """Set up pyrcrack instance."""
         self.iface = None
-        self.list_waiting_time = list_waiting_time
 
     @property
     async def interfaces(self):
@@ -51,7 +50,7 @@ class Pyrcrack:
         assert interface in await self.interfaces
         async with AirmonNg() as airmon:
             interface = await airmon.set_monitor(interface)
-            self.iface = interface[0]
+            self.iface = interface[0]['monitor']['interface']
 
     @property
     async def access_points(self) -> list:
@@ -64,5 +63,7 @@ class Pyrcrack:
         Returns: List `AccessPoint` instances
         """
         async with AirodumpNg() as pdump:
-            asyncio.sleep(10)
-            return [a async for a in pdump(self.iface)]
+            async for res in pdump(self.iface):
+                if res:
+                    return res
+                asyncio.sleep(10)
