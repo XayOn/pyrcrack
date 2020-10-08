@@ -20,7 +20,6 @@ class AirmonNg(ExecutorHelper):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.monitor_enabled = []
-        self.interface = None
 
     async def run(self, *args, **kwargs):
         """Check argument position. Forced for this one."""
@@ -37,9 +36,9 @@ class AirmonNg(ExecutorHelper):
             reader = csv.DictReader(fileo, dialect='excel-tab')
             return [{a.lower(): b for a, b in row.items()} for row in reader]
 
-    def __call__(self, interface):
-        self.interface = interface
-        return self
+    @property
+    def interface(self):
+        return self.run_args[0][0]
 
     async def __aenter__(self):
         """Put selected interface in monitor mode."""
