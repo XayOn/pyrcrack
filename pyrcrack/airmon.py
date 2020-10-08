@@ -20,6 +20,7 @@ class AirmonNg(ExecutorHelper):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.monitor_enabled = []
+        self.interface = None
 
     async def run(self, *args, **kwargs):
         """Check argument position. Forced for this one."""
