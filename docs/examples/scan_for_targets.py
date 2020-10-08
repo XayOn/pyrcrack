@@ -1,10 +1,10 @@
 """Scan for targets and and pretty print some data."""
 import asyncio
-import sys
 
 import pyrcrack
 
 from rich.console import Console
+from rich.prompt import Prompt
 
 
 async def scan_for_targets():
@@ -12,15 +12,17 @@ async def scan_for_targets():
     console = Console()
     console.clear()
     console.show_cursor(False)
-    async with pyrcrack.AirodumpNg() as pdump:
-        async for result in pdump(sys.argv[1]):
-            # Current running process will be stored in self.proc
-            # Be careful, the process will only start when you iter trough
-            # results. A simple await anext(pdump(...)) would do if you don't
-            # reallywant to gather results.
-            console.clear()
-            console.print(result.table)
-            await asyncio.sleep(2)
+    airmon = pyrcrack.AirmonNg()
+
+    interface = Prompt.ask(
+        'Select an interface',
+        choices=[a['interface'] for a in await airmon.interfaces])
+    async with airmon(interface) as mon:
+        async with pyrcrack.AirodumpNg() as pdump:
+            async for result in pdump(mon.monitor_interface):
+                console.clear()
+                console.print(result.table)
+                await asyncio.sleep(2)
 
 
 asyncio.run(scan_for_targets())
