@@ -5,7 +5,7 @@ import re
 from .executor import ExecutorHelper
 
 MONITOR_RE = re.compile(
-    '\t\t\((\w+) (\w+) mode vif (\w+) for \[\w+\](\w+) on \[\w+\](\w+)\)')
+    r'\t\t\((\w+) (\w+) mode vif (\w+) for \[\w+\](\w+) on \[\w+\](\w+)\)')
 
 
 class AirmonNg(ExecutorHelper):
