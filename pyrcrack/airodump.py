@@ -88,7 +88,6 @@ class AirodumpNg(ExecutorHelper):
         elif kwargs.get('write-format') and 'kismet' not in kwargs.get(
                 'write-format', ''):
             kwargs['write-format'] += ',kismet'
-        print(kwargs)
 
         return await super().run(*args, **kwargs)
 
