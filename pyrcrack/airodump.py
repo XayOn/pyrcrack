@@ -24,7 +24,6 @@ class AirodumpNg(ExecutorHelper):
            --ivs                 : Save only captured IVs
            --gpsd                : Use GPSd
            --write <prefix>      : Dump file prefix
-           -w <prefix>           : same as --write
            --beacons             : Record all beacons in dump file
            --update <secs>       : Display update delay in seconds
            --showack             : Prints ack/cts/rts statistics
@@ -75,19 +74,17 @@ class AirodumpNg(ExecutorHelper):
     async def run(self, *args, **kwargs):
         """Run async, with prefix stablished as tempdir."""
         self.execn += 1
-        kwargs['background'] = 1
-        if not ('write' in kwargs or 'w' in kwargs):
-            kwargs.pop('w', None)
-            kwargs['write'] = self.tempdir.name + "/" + self.uuid
-        if 'write_interval' not in kwargs:
-            kwargs['write_interval'] = 1
 
-        # Ensure kismet xml is going to be written
-        if kwargs.get('write-format', None) is not None:
-            kwargs['write-format'] = 'kismet,csv,logcsv'
-        elif kwargs.get('write-format') and 'kismet' not in kwargs.get(
-                'write-format', ''):
-            kwargs['write-format'] += ',kismet'
+        kwargs = {
+            'background': 1,
+            'write': self.tempdir.name + '/' + self.uuid,
+            'write-interval': 1,
+            'output-format': 'netxml,logcsv',
+            **kwargs
+        }
+
+        if 'kismet' not in kwargs.get('output-format', ''):
+            kwargs['output-format'] += ',netxml'
 
         return await super().run(*args, **kwargs)
 
@@ -132,10 +129,13 @@ class AirodumpNg(ExecutorHelper):
                 dotmap_data = dotmap.DotMap(xmla)
                 results = dotmap_data['detection-run']['wireless-network']
                 if results:
-                    return Result(
-                        sorted([AccessPoint(ap) for ap in results],
-                               key=lambda x: x.score,
-                               reverse=True))
-                return []
+                    if isinstance(results, list):
+                        return Result(
+                            sorted([AccessPoint(ap) for ap in results],
+                                   key=lambda x: x.score,
+                                   reverse=True))
+                    else:
+                        return Result([AccessPoint(results)])
+                return Result([])
 
             await asyncio.sleep(1)

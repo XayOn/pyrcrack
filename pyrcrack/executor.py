@@ -176,6 +176,7 @@ class ExecutorHelper:
             self.tempfile.__exit__(*args, **kwargs)
         elif self.requires_tempdir:
             self.tempdir.__exit__(*args, **kwargs)
+        self.proc.kill()
 
     async def __aenter__(self):
         """Create temporary directories and files if required."""

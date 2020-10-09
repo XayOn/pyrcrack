@@ -105,6 +105,14 @@ class AccessPoint:
         return f"{self.essid} - ({self.bssid})"
 
     @property
+    def airodump(self):
+        return {'channel': self.channel, 'bssid': self.bssid}
+
+    @property
+    def channel(self):
+        return self.data.channel
+
+    @property
     def clients(self):
         """List of connected clients.
 
@@ -123,7 +131,8 @@ class AccessPoint:
             'bssid': self.bssid,
             'packets': str(self.packets.total),
             'dbm': str(self.dbm),
-            'score': str(self.score)
+            'score': str(self.score),
+            'channel': str(self.channel)
         }
 
     @property
