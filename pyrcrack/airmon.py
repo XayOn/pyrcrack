@@ -1,11 +1,6 @@
 """Airmon-ng"""
-import io
-import csv
-import re
 from .executor import ExecutorHelper
-
-MONITOR_RE = re.compile(
-    r'\t\t\((\w+) (\w+) mode vif (\w+) for \[\w+\](\w+) on \[\w+\](\w+)\)')
+from .models import Interfaces
 
 
 class AirmonNg(ExecutorHelper):
@@ -19,70 +14,37 @@ class AirmonNg(ExecutorHelper):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.dirty = False
         self.monitor_enabled = []
-        self.interface = None
 
     async def run(self, *args, **kwargs):
         """Check argument position. Forced for this one."""
+        self.dirty = True
         if args:
             assert any(a in args[0] for a in ('start', 'stop', 'check'))
         return await super().run(*args, **kwargs)
 
-    @staticmethod
-    def parse(res):
-        """Parse csv results"""
-        with io.StringIO() as fileo:
-            fileo.write(res.decode().strip().replace('\t\t', '\t'))
-            fileo.seek(0)
-            reader = csv.DictReader(fileo, dialect='excel-tab')
-            return [{a.lower(): b for a, b in row.items()} for row in reader]
-
-    def __call__(self, interface):
-        self.interface = interface
-        return self
-
     async def __aenter__(self):
         """Put selected interface in monitor mode."""
-        if not self.interface:
+        if not self.run_args[0][0]:
             raise RuntimeError('Should be called (airmon()) first.')
-        self.interface_data = await self.set_monitor(self.interface)
+        ifaces = await self.interfaces
+        if not any(a.interface == self.run_args[0][0] for a in ifaces):
+            raise ValueError('Invalid interface selected')
+        await self.run('start', self.run_args[0][0])
+        # Save interface data while we're on the async cm.
+        self._interface_data = await self.interfaces
         return self
-
-    @property
-    def monitor_interface(self):
-        return self.interface_data[self.interface]['monitor']['interface']
 
     async def __aexit__(self, *args, **kwargs):
         """Set monitor-enabled interfaces back to normal"""
-        for interface in self.monitor_enabled:
-            await self.stop(interface)
+        await self.run('stop', self.monitor_interface)
 
-    async def stop(self, wifi, *args):
-        """Stop monitor mode"""
-        await self.run('stop', wifi, *args)
-
-    async def set_monitor(self, wifi, *args):
-        """Set monitor mode interface"""
-        assert any(a.get('interface') == wifi
-                   for a in await self.interfaces), 'Wrong interface selected'
-
-        await self.run('start', wifi, *args)
-        res = [a for a in (await self.proc.communicate())[0].split(b'\n') if a]
-        pos = res.index(b'PHY	Interface	Driver		Chipset')
-        ifaces_data = self.parse(b'\n'.join(
-            [a for a in res[pos:] if a and not a.startswith(b'\t\t')]))
-        ifaces = {k['interface']: k for k in ifaces_data}
-        keys = ['driver', 'mode', 'status', 'original_interface', 'interface']
-        monitor_lines = res[pos + len(ifaces_data) + 1:]
-        monitor_data = (dict(zip(keys,
-                                 MONITOR_RE.match(a.decode()).groups()))
-                        for a in monitor_lines if MONITOR_RE.match(a.decode()))
-        for data in monitor_data:
-            ifaces[data['original_interface']][data['mode']] = data
-            if data['mode'] == 'monitor':
-                self.monitor_enabled.append(data['interface'])
-
-        return ifaces
+    @property
+    def monitor_interface(self):
+        iface = next(a for a in self._interface_data
+                     if a.interface == self.run_args[0][0])
+        return iface.monitor
 
     @property
     async def interfaces(self):
@@ -95,5 +57,7 @@ class AirmonNg(ExecutorHelper):
 
         Returns: None
         """
-        await self.run()
-        return self.parse((await self.proc.communicate())[0])
+        if not self.dirty:
+            await self.run()
+            self.dirty = False
+        return Interfaces(await self.readlines())

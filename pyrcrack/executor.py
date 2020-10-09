@@ -8,7 +8,6 @@ import logging
 import subprocess
 import tempfile
 import uuid
-
 import docopt
 import stringcase
 
@@ -162,6 +161,11 @@ class ExecutorHelper:
     def running(self):
         return self.proc.returncode is None
 
+    async def readlines(self):
+        """Return lines as per proc.communicate, non-empty ones."""
+        com = await self.proc.communicate()
+        return [a for a in com[0].split(b'\n') if a]
+
     @property
     async def results(self):
         return [self.proc]
@@ -172,6 +176,7 @@ class ExecutorHelper:
             self.tempfile.__exit__(*args, **kwargs)
         elif self.requires_tempdir:
             self.tempdir.__exit__(*args, **kwargs)
+        self.proc.kill()
 
     async def __aenter__(self):
         """Create temporary directories and files if required."""
