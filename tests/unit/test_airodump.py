@@ -29,6 +29,8 @@ async def test_run_airodump():
                                        airodump.uuid,
                                        '--write-interval',
                                        '1',
+                                       '--output-format',
+                                       'netxml,logcsv,netxml',
                                        stderr=-1,
                                        stdout=-1,
                                        stdin=-1)
@@ -44,26 +46,14 @@ async def test_run_airodump_with_write():
         with asynctest.mock.patch("asyncio.create_subprocess_exec") as runmock:
             await airodump.run(write='foo')
             runmock.assert_called_with('airodump-ng',
+                                       '--background',
+                                       '1',
                                        '--write',
                                        'foo',
-                                       '--background',
-                                       '1',
                                        '--write-interval',
                                        '1',
-                                       stderr=-1,
-                                       stdout=-1,
-                                       stdin=-1)
-
-    async with AirodumpNg() as airodump:
-        with asynctest.mock.patch("asyncio.create_subprocess_exec") as runmock:
-            await airodump.run(w='foo')
-            runmock.assert_called_with('airodump-ng',
-                                       '-w',
-                                       'foo',
-                                       '--background',
-                                       '1',
-                                       '--write-interval',
-                                       '1',
+                                       '--output-format',
+                                       'netxml,logcsv,netxml',
                                        stderr=-1,
                                        stdout=-1,
                                        stdin=-1)
@@ -73,8 +63,10 @@ async def test_run_airodump_with_write():
 async def test_csv():
     """Test main run method."""
     from pyrcrack import AirodumpNg
+    from unittest.mock import MagicMock
 
     async with AirodumpNg() as airodump:
         expected = (f"{airodump.tempdir.name}/{airodump.uuid}"
                     f"-{airodump.execn:02}.kismet.csv")
+        airodump.proc = MagicMock()
         assert airodump.get_file('kismet.csv') == expected

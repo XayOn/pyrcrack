@@ -1,7 +1,5 @@
 """Scan for targets and and pretty print some data."""
 import asyncio
-from asyncio import TimeoutError
-from async_timeout import timeout
 
 import pyrcrack
 
@@ -25,9 +23,6 @@ async def scan_for_targets():
 
     async with airmon(interface) as mon:
         async with pyrcrack.AirodumpNg() as pdump:
-            # TODO: Maybe copy this object upon __call__ so we can do, paralell
-            # async for result in pdump(foo) (the only relevant part would be
-            # execn properties) within the same temporary path?
             async for aps in pdump(mon.monitor_interface):
                 console.clear()
                 console.print(aps.table)
