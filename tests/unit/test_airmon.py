@@ -20,7 +20,4 @@ async def test_run_airmon():
 
     with asynctest.mock.patch("asyncio.create_subprocess_exec") as runmock:
         await AirmonNg().run()
-        runmock.assert_called_with('airmon-ng',
-                                   stderr=-1,
-                                   stdout=-1,
-                                   stdin=-1)
+        runmock.assert_called_with('airmon-ng', stderr=-1, stdout=-1, stdin=-1)

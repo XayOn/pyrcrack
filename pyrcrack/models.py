@@ -162,7 +162,7 @@ class AccessPoint:
         dict_score = bool(any(self.essid.startswith(a) for a in DICTS))
         name_score = -1000 if not self.essid else 0
         enc_score = 1000 if 'WEP' in self.encryption else 0
-        return packet_score + dbm_score + dict_score + name_score
+        return packet_score + dbm_score + dict_score + name_score + enc_score
 
     @property
     def packets(self):
