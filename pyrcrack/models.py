@@ -32,6 +32,7 @@ class Interface:
         for data in monitor_data:
             if data['original_interface'] == self.data['interface']:
                 self.data[data['mode']] = data
+
     @property
     def interface(self):
         return self.data['interface']
@@ -41,7 +42,8 @@ class Interface:
         return self.data['monitor']['interface']
 
     def asdict(self):
-        return self.data 
+        return self.data
+
 
 class Interfaces(Result):
     def __init__(self, data):

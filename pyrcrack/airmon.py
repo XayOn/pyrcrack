@@ -14,7 +14,7 @@ class AirmonNg(ExecutorHelper):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.dirty = False 
+        self.dirty = False
         self.monitor_enabled = []
 
     async def run(self, *args, **kwargs):
