@@ -13,10 +13,12 @@ async def scan_for_targets():
     console.clear()
     console.show_cursor(False)
     airmon = pyrcrack.AirmonNg()
+    interfaces = await airmon.interfaces
+    console.print(interfaces.table)
 
-    interface = Prompt.ask(
-        'Select an interface',
-        choices=[a['interface'] for a in await airmon.interfaces])
+    interface = Prompt.ask('Select an interface',
+                           choices=[a.interface for a in interfaces])
+
     async with airmon(interface) as mon:
         async with pyrcrack.AirodumpNg() as pdump:
             async for result in pdump(mon.monitor_interface):

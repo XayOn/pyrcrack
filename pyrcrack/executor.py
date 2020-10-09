@@ -8,7 +8,6 @@ import logging
 import subprocess
 import tempfile
 import uuid
-
 import docopt
 import stringcase
 
@@ -162,9 +161,10 @@ class ExecutorHelper:
     def running(self):
         return self.proc.returncode is None
 
-    async def readlines():
+    async def readlines(self):
         """Return lines as per proc.communicate, non-empty ones."""
-        return [a for a in (await self.proc.communicate())[0].split(b'\n') if a]
+        com = await self.proc.communicate()
+        return [a for a in com[0].split(b'\n') if a]
 
     @property
     async def results(self):

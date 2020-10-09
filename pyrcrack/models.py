@@ -1,6 +1,11 @@
+import io
+import csv
+import re
 from rich.table import Table
 
 DICTS = ('WLAN_', 'JAZZTEL_', 'MOVISTAR_')
+MONITOR_RE = re.compile(
+    r'\t\t\((\w+) (\w+) mode vif (\w+) for \[\w+\](\w+) on \[\w+\](\w+)\)')
 
 
 class Result(list):
@@ -19,6 +24,48 @@ class Result(list):
                 res = res.asdict()
                 table.add_row(*[res[k] for k in keys])
         return table
+
+
+class Interface:
+    def __init__(self, data, monitor_data):
+        self.data = data
+        for data in monitor_data:
+            if data['original_interface'] == self.data['interface']:
+                self.data[data['mode']] = data
+    @property
+    def interface(self):
+        return self.data['interface']
+
+    @property
+    def monitor(self):
+        return self.data['monitor']['interface']
+
+    def asdict(self):
+        return self.data 
+
+class Interfaces(Result):
+    def __init__(self, data):
+        pos = data.index(b'PHY	Interface	Driver		Chipset')
+        ifaces_data = self.parse(b'\n'.join(
+            [a for a in data[pos:] if a and not a.startswith(b'\t\t')]))
+        monitor_data = filter(lambda x: MONITOR_RE.match(x.decode()),
+                              data[pos + len(ifaces_data) + 1:])
+
+        def groups(data):
+            return MONITOR_RE.match(data.decode()).groups()
+
+        keys = ['driver', 'mode', 'status', 'original_interface', 'interface']
+        monitor_data = [dict(zip(keys, groups(a))) for a in monitor_data]
+        self.extend([Interface(a, monitor_data) for a in ifaces_data])
+
+    @staticmethod
+    def parse(res):
+        """Parse csv results"""
+        with io.StringIO() as fileo:
+            fileo.write(res.decode().strip().replace('\t\t', '\t'))
+            fileo.seek(0)
+            reader = csv.DictReader(fileo, dialect='excel-tab')
+            return [{a.lower(): b for a, b in row.items()} for row in reader]
 
 
 class Client:
