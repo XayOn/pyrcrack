@@ -2,11 +2,79 @@ Changelog
 =========
 
 
+1.1.0
+------------
+- Added encryption to ap list. [David Francos]
+- Updated examples. [David Francos]
+- Refactor on airodump. [David Francos]
+
+  - Added channel
+  - Fixed default params behaviour (it was a mess and it wasnt working)
+- Fixed PEP-8. [David Francos]
+- Closes: #18 Refactor on airodump-ng module. [David Francos]
+- Added logo. [David Francos]
+- Added logo. [David Francos]
+- Not overriding __call__ on airmon. [David Francos]
+- Updated readme. [David Francos]
+- Merge branch 'develop' into master. [David Francos]
+- Updated readme. [David Francos]
+- Removed Pyrcrack class. [David Francos]
+
+  With the new airmon-ng and airodump-ng APIs with async context managers,
+  proper properties for results and interfaces and callable objects, the
+  "simplified" interface that exposed the Pyrcrack class is no longer
+  needed.
+
+  Usage is more comprehensive now, and cleanup afterwards should work.
+  Altough examples seem to not wait for __aexit__ to cleanup (thus
+  airmon-ng's created interface would prevail) upon KeyboardInterrupt.
+
+  Might be caused by https://bugs.python.org/issue29988 wich relates to
+  bpo-29988 ( https://github.com/python/cpython/pull/18334 )
+- Improved airmon-ng API to look like airodump's. [David Francos]
+- PEP-8 fixes. [David Francos]
+- Removed print from airodump. [David Francos]
+- Removed debug mode on logs by default. [David Francos]
+- Added new example using Pyrcrack simplified api. [David Francos]
+- Fixed access_points shortcut on Pyrcrack class. [David Francos]
+- Moved async iterator logic to main executor class. [David Francos]
+- Fixed airmon-ng monitor mode parsing for 1.6. [David Francos]
+- Updated examples. [David Francos]
+- Feature/16 (#17) [David Francos]
+
+  * wip: #16 Aircrack-ng 1.6 and new AirodumpNG API
+
+  This introduces the changes stated in #16.
+  A new async iterator for airodump-ng class, uses netxml files, detects
+  process finish and issues trying to launch the current command (and
+  reports the issues wich didn't before, as stated in #8
+- Closes: #16 Fixed tests. [David Francos]
+
+  Lowered test coverage for the moment.
+- Wip: #16 Migrated to aircrack-ng. [David Francos]
+- Wip: #16 Aircrack-ng 1.6 and new AirodumpNG API. [David Francos]
+
+  This introduces the changes stated in #16.
+  A new async iterator for airodump-ng class, uses netxml files, detects
+  process finish and issues trying to launch the current command (and
+  reports the issues wich didn't before, as stated in #8
+- Closes: #13 Fixed readme install instructions. [David Francos]
+- Fixed image position on readme. [David Francos]
+- Fixed image position on readme. [David Francos]
+- Merge tag '1.0.2' into develop. [David Francos]
+
+  1.0.2
+- Fixed image position on readme. [David Francos]
+
+
 1.0.2 (2020-09-23)
 ------------------
+- Merge branch 'release/1.0.2' [David Francos]
+- Version bump to 1.0.2. [David Francos]
 - Merge tag '1.0.1' into develop. [David Francos]
 
   1.0.1
+- Fixed prev release name. [David Francos]
 
 
 1.0.1 (2020-09-23)
