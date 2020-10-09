@@ -162,6 +162,10 @@ class ExecutorHelper:
     def running(self):
         return self.proc.returncode is None
 
+    async def readlines():
+        """Return lines as per proc.communicate, non-empty ones."""
+        return [a for a in (await self.proc.communicate())[0].split(b'\n') if a]
+
     @property
     async def results(self):
         return [self.proc]
