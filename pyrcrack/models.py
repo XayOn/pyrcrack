@@ -113,6 +113,10 @@ class AccessPoint:
         return self.data.channel
 
     @property
+    def encryption(self):
+        return self.data.SSID.encryption
+
+    @property
     def clients(self):
         """List of connected clients.
 
@@ -132,7 +136,8 @@ class AccessPoint:
             'packets': str(self.packets.total),
             'dbm': str(self.dbm),
             'score': str(self.score),
-            'channel': str(self.channel)
+            'channel': str(self.channel),
+            'encryption': '/'.join(self.encryption)
         }
 
     @property
@@ -156,6 +161,7 @@ class AccessPoint:
         dbm_score = -int(self.dbm)
         dict_score = bool(any(self.essid.startswith(a) for a in DICTS))
         name_score = -1000 if not self.essid else 0
+        enc_score = 1000 if 'WEP' in self.encryption else 0
         return packet_score + dbm_score + dict_score + name_score
 
     @property
