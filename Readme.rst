@@ -1,4 +1,4 @@
-.. image:: docs/kodilovesdocker.png 
+.. image:: ./docs/pythonlovesaircrack.png
 
 **Python aircrack-ng bindings**
 
