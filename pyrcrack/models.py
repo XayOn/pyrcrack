@@ -51,7 +51,7 @@ class Interfaces(Result):
         ifaces_data = self.parse(b'\n'.join(
             [a for a in data[pos:] if a and not a.startswith(b'\t\t')]))
         monitor_data = filter(lambda x: MONITOR_RE.match(x.decode()),
-                              data[pos + len(ifaces_data) + 1:])
+                              data[pos + len(ifaces_data):])
 
         def groups(data):
             return MONITOR_RE.match(data.decode()).groups()
