@@ -35,7 +35,8 @@ def test_run_model():
         b'  381 wpa_supplicant', b'  481 dhcpcd',
         b'PHY\tInterface\tDriver\t\tChipset',
         b'phy0\twlan0\t\tbrcmfmac\tBroadcom 43430',
-        b'\t\t(mac80211 monitor mode vif enabled for [phy0]wlan0 on [phy0]wlan0mon)',
+        (b'\t\t(mac80211 monitor mode vif enabled for [phy0]wlan0'
+         b' on [phy0]wlan0mon)'),
         b'\t\t(mac80211 station mode vif disabled for [phy0]wlan0)',
         b'phy1\twlxe84e066b5386\tmt7601u\t\tRalink Technology, Corp. MT7601U'
     ]
@@ -45,11 +46,13 @@ def test_run_model():
             'interface': 'wlan0',
             'driver': 'brcmfmac',
             'chipset': 'Broadcom 43430',
-            'monitor': {'driver': 'mac80211',
-                        'interface': 'wlan0mon',
-                        'mode': 'monitor',
-                        'original_interface': 'wlan0',
-                        'status': 'enabled'},
+            'monitor': {
+                'driver': 'mac80211',
+                'interface': 'wlan0mon',
+                'mode': 'monitor',
+                'original_interface': 'wlan0',
+                'status': 'enabled'
+            },
         }
     }, {
         'data': {
@@ -88,10 +91,12 @@ phy0	wlp3s0		iwlwifi		Intel Corporation Wireless 7260 (rev 83)
             'interface': 'wlp3s0',
             'driver': 'iwlwifi',
             'chipset': 'Intel Corporation Wireless 7260 (rev 83)',
-            'monitor': {'driver': 'mac80211',
-                        'interface': 'wlp3s0mon',
-                        'mode': 'monitor',
-                        'original_interface': 'wlp3s0',
-                        'status': 'enabled'},
+            'monitor': {
+                'driver': 'mac80211',
+                'interface': 'wlp3s0mon',
+                'mode': 'monitor',
+                'original_interface': 'wlp3s0',
+                'status': 'enabled'
+            },
         }
     }]
