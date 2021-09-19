@@ -80,14 +80,14 @@ class Client:
 
     @property
     def packets(self):
-        return self.data.packets.total
+        return getattr(self.data.packets, "total", 0)
 
     @property
     def dbm(self):
         return self.data['snr-info'].last_signal_dbm
 
 
-class AccessPoint:
+class AccessPoint(dict):
     """Represents an access point.
 
     Stores internal data in "data" property
@@ -100,6 +100,7 @@ class AccessPoint:
             data: Dot data structure from kismet xml file.
         """
         self.data = data
+        self.update(self.asdict())
 
     def __repr__(self):
         return f"{self.essid} - ({self.bssid})"
@@ -129,11 +130,15 @@ class AccessPoint:
         else:
             return [Client(self.data['wireless-client'])]
 
+    @property
+    def total_packets(self):
+        return getattr(self.packets, "total", 0)
+
     def asdict(self):
         return {
             'essid': self.essid,
             'bssid': self.bssid,
-            'packets': str(self.packets.total),
+            'packets': str(self.total_packets),
             'dbm': str(self.dbm),
             'score': str(self.score),
             'channel': str(self.channel),
@@ -157,7 +162,7 @@ class AccessPoint:
         Score will take in account the total packets received, the dbm and if a
         ssid is susceptible to have dictionaries.
         """
-        packet_score = int(self.packets.total)
+        packet_score = int(self.total_packets)
         dbm_score = -int(self.dbm)
         dict_score = bool(any(self.essid.startswith(a) for a in DICTS))
         name_score = -1000 if not self.essid else 0
