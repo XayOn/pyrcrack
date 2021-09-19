@@ -44,7 +44,12 @@ def test_run_model():
             'phy': 'phy0',
             'interface': 'wlan0',
             'driver': 'brcmfmac',
-            'chipset': 'Broadcom 43430'
+            'chipset': 'Broadcom 43430',
+            'monitor': {'driver': 'mac80211',
+                        'interface': 'wlan0mon',
+                        'mode': 'monitor',
+                        'original_interface': 'wlan0',
+                        'status': 'enabled'},
         }
     }, {
         'data': {
@@ -82,6 +87,11 @@ phy0	wlp3s0		iwlwifi		Intel Corporation Wireless 7260 (rev 83)
             'phy': 'phy0',
             'interface': 'wlp3s0',
             'driver': 'iwlwifi',
-            'chipset': 'Intel Corporation Wireless 7260 (rev 83)'
+            'chipset': 'Intel Corporation Wireless 7260 (rev 83)',
+            'monitor': {'driver': 'mac80211',
+                        'interface': 'wlp3s0mon',
+                        'mode': 'monitor',
+                        'original_interface': 'wlp3s0',
+                        'status': 'enabled'},
         }
     }]
