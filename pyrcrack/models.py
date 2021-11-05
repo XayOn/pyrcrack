@@ -47,6 +47,8 @@ class Interface:
 
 class Interfaces(Result):
     def __init__(self, data):
+        if data == [b'Run it as root']:
+            raise Exception('Pyrcrack must be run as root')
         pos = data.index(b'PHY	Interface	Driver		Chipset')
         ifaces_data = self.parse(b'\n'.join(
             [a for a in data[pos:] if a and not a.startswith(b'\t\t')]))

@@ -1,4 +1,5 @@
 """Airmon-ng"""
+import asyncio
 from .executor import ExecutorHelper
 from .models import Interfaces
 
@@ -39,6 +40,9 @@ class AirmonNg(ExecutorHelper):
     async def __aexit__(self, *args, **kwargs):
         """Set monitor-enabled interfaces back to normal"""
         await self.run('stop', self.monitor_interface)
+        self.dirty = False
+        await asyncio.sleep(1)
+        await self.interfaces
 
     @property
     def monitor_interface(self):
