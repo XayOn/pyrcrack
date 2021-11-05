@@ -2,8 +2,49 @@ Changelog
 =========
 
 
-1.1.0
-------------
+1.1.2 (2021-11-05)
+------------------
+
+Fix
+~~~
+- Added run-as-root message. [David Francos]
+- Fixed airmon test. [David Francos]
+
+Other
+~~~~~
+- Chore: Fixed aireplay example (and improved it a bit) [David Francos]
+- Fixed pep8. [David Francos]
+- Feat: Added debug mode. Don't delete tempfiles. [David Francos]
+- Closes: #24 Added total_packets property. [David Francos]
+- Merge branch 'develop' of github.com:XayOn/pyrcrack into develop.
+  [David Francos]
+- Create codeql-analysis.yml. [David Francos]
+
+
+1.1.1 (2021-03-21)
+------------------
+- Version bump to 1.1.1. [David Francos]
+- Closes: #20 Fix optimization on mon iface search. [David Francos]
+
+  Seems like on some scenarios (still unclear), assuming an extra newline
+  character will break monitor interface lookup. As this is only an
+  optimization, it can be safely removed.
+- Trying rich approach to GH detecting poetry packages. [David Francos]
+- Trying rich approach to GH detecting poetry packages. [David Francos]
+- Updated ipnb example. [David Francos]
+- Fixed ipynb. [David Francos]
+- Added example notebook to readme. [David Francos]
+
+
+1.1.0 (2020-10-09)
+------------------
+- Fixed PEP-8. [David Francos]
+- Added ipython notebook example. [David Francos]
+- Merge tag '1.1.0' into develop. [David Francos]
+
+  1.1.0
+- Merge branch 'release/1.1.0' into master. [David Francos]
+- Version bump to 1.1.0. [David Francos]
 - Added encryption to ap list. [David Francos]
 - Updated examples. [David Francos]
 - Refactor on airodump. [David Francos]
