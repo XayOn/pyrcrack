@@ -39,10 +39,15 @@ keyword parameters and arguments, and checks them BEFORE trying to run them.
 Some classes expose themselves as async iterators, as airodump-ng's wich
 returns access points with its associated clients.
 
-You can have a look at the examples/ folder for some usage examples, such as
-the basic "scan for targets", that will list available interfaces, let you
-choose one, put it in monitor mode, and scan for targets updating results each
-2 seconds.
+Examples
+--------
+
+Be sure to check the python `notebook example <./docs/examples/example.ipynb>`_.
+
+You can have also have a look at the examples/ folder for some usage examples,
+such as the basic "scan for targets", that will list available interfaces, let
+you choose one, put it in monitor mode, and scan for targets updating results
+each 2 seconds.
 
 .. code:: python
 

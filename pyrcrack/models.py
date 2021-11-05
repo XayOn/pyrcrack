@@ -47,11 +47,13 @@ class Interface:
 
 class Interfaces(Result):
     def __init__(self, data):
+        if data == [b'Run it as root']:
+            raise Exception('Pyrcrack must be run as root')
         pos = data.index(b'PHY	Interface	Driver		Chipset')
         ifaces_data = self.parse(b'\n'.join(
             [a for a in data[pos:] if a and not a.startswith(b'\t\t')]))
         monitor_data = filter(lambda x: MONITOR_RE.match(x.decode()),
-                              data[pos + len(ifaces_data) + 1:])
+                              data[pos + len(ifaces_data):])
 
         def groups(data):
             return MONITOR_RE.match(data.decode()).groups()
@@ -80,14 +82,14 @@ class Client:
 
     @property
     def packets(self):
-        return self.data.packets.total
+        return getattr(self.data.packets, "total", 0)
 
     @property
     def dbm(self):
         return self.data['snr-info'].last_signal_dbm
 
 
-class AccessPoint:
+class AccessPoint(dict):
     """Represents an access point.
 
     Stores internal data in "data" property
@@ -100,6 +102,7 @@ class AccessPoint:
             data: Dot data structure from kismet xml file.
         """
         self.data = data
+        self.update(self.asdict())
 
     def __repr__(self):
         return f"{self.essid} - ({self.bssid})"
@@ -129,11 +132,15 @@ class AccessPoint:
         else:
             return [Client(self.data['wireless-client'])]
 
+    @property
+    def total_packets(self):
+        return getattr(self.packets, "total", 0)
+
     def asdict(self):
         return {
             'essid': self.essid,
             'bssid': self.bssid,
-            'packets': str(self.packets.total),
+            'packets': str(self.total_packets),
             'dbm': str(self.dbm),
             'score': str(self.score),
             'channel': str(self.channel),
@@ -157,12 +164,12 @@ class AccessPoint:
         Score will take in account the total packets received, the dbm and if a
         ssid is susceptible to have dictionaries.
         """
-        packet_score = int(self.packets.total)
+        packet_score = int(self.total_packets)
         dbm_score = -int(self.dbm)
         dict_score = bool(any(self.essid.startswith(a) for a in DICTS))
         name_score = -1000 if not self.essid else 0
         enc_score = 1000 if 'WEP' in self.encryption else 0
-        return packet_score + dbm_score + dict_score + name_score
+        return packet_score + dbm_score + dict_score + name_score + enc_score
 
     @property
     def packets(self):
