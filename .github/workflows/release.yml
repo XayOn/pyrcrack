@@ -64,5 +64,3 @@ jobs:
           asset_content_type: application/zip
       - name: Publish a Python distribution to PyPI
         run: poetry publish --username xayon --password "${{ secrets.pypi_password }}"
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
