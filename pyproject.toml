@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyrcrack"
-version = "1.1.0"
+version = "1.1.2"
 description = "Pythonic aircrack-ng bindings"
 license = "MIT"
 authors = ["David Francos <opensource@davidfrancos.net>"]

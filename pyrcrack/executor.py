@@ -1,5 +1,6 @@
 """Pyrcrack-ng Executor helper."""
 
+import os
 import abc
 import asyncio
 import functools
@@ -74,6 +75,7 @@ class ExecutorHelper:
         self.logger = logging.getLogger(self.__class__.__name__)
         self.proc = None
         self.meta = {}
+        self.debug = os.getenv('PYRCRACK_DEBUG', '') == 1
         if self.requires_tempfile:
             self.tempfile = tempfile.NamedTemporaryFile()
         elif self.requires_tempdir:
@@ -173,9 +175,15 @@ class ExecutorHelper:
     async def __aexit__(self, *args, **kwargs):
         """Clean up conext manager."""
         if self.requires_tempfile:
-            self.tempfile.__exit__(*args, **kwargs)
+            if self.debug:
+                self.logger.error(f'Debug mode, not deleting {self.tempfile}')
+            else:
+                self.tempfile.__exit__(*args, **kwargs)
         elif self.requires_tempdir:
-            self.tempdir.__exit__(*args, **kwargs)
+            if self.debug:
+                self.logger.error(f'Debug mode, not deleting {self.tempdir}')
+            else:
+                self.tempdir.__exit__(*args, **kwargs)
         self.proc.kill()
 
     async def __aenter__(self):
