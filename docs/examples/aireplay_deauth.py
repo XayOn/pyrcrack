@@ -2,7 +2,6 @@
 from contextlib import suppress
 
 from rich.console import Console
-from rich.prompt import Prompt
 
 import asyncio
 import pyrcrack
