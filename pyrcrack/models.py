@@ -39,7 +39,7 @@ class Interface:
 
     @property
     def monitor(self):
-        return self.data['monitor']['interface']
+        return self.data['interface']
 
     def asdict(self):
         return self.data
