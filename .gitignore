@@ -7,3 +7,6 @@ dist
 .eggs
 .coverage
 __pycache__
+
+# IDE
+.vscode
