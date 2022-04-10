@@ -21,13 +21,13 @@ async def test_run_airodump():
             airodump.result_updater = asynctest.mock.CoroutineMock()
             await airodump.run()
             assert runmock.called
-            runmock.assert_called_with(
-                'airodump-ng',
-                '--write',
-                airodump.tempdir.name + "/" + airodump.uuid,
-                stderr=-1,
-                stdout=-1,
-                stdin=-1)
+            runmock.assert_called_with('airodump-ng',
+                                       '--write',
+                                       airodump.tempdir.name + "/" +
+                                       airodump.uuid,
+                                       stderr=-1,
+                                       stdout=-1,
+                                       stdin=-1)
 
 
 @pytest.mark.asyncio
@@ -39,19 +39,22 @@ async def test_run_airodump_with_write():
     async with AirodumpNg() as airodump:
         with asynctest.mock.patch("asyncio.create_subprocess_exec") as runmock:
             await airodump.run(write='foo')
-            runmock.assert_called_with(
-                'airodump-ng',
-                '--write',
-                'foo',
-                stderr=-1,
-                stdout=-1,
-                stdin=-1)
+            runmock.assert_called_with('airodump-ng',
+                                       '--write',
+                                       'foo',
+                                       stderr=-1,
+                                       stdout=-1,
+                                       stdin=-1)
 
     async with AirodumpNg() as airodump:
         with asynctest.mock.patch("asyncio.create_subprocess_exec") as runmock:
             await airodump.run(w='foo')
-            runmock.assert_called_with(
-                'airodump-ng', '-w', 'foo', stderr=-1, stdout=-1, stdin=-1)
+            runmock.assert_called_with('airodump-ng',
+                                       '-w',
+                                       'foo',
+                                       stderr=-1,
+                                       stdout=-1,
+                                       stdin=-1)
 
 
 @pytest.mark.asyncio
@@ -63,8 +66,9 @@ async def test_csv():
     async with AirodumpNg() as airodump:
         assert not airodump.csv_file
         dir_ = airodump.tempdir.name + "/"
-        with tempfile.NamedTemporaryFile(
-                dir=dir_, prefix=airodump.uuid + "-", suffix='.csv') as named:
+        with tempfile.NamedTemporaryFile(dir=dir_,
+                                         prefix=airodump.uuid + "-",
+                                         suffix='.csv') as named:
             named.write(b'')
             print(named.name)
             assert airodump.csv_file
@@ -77,7 +81,6 @@ async def test_sorted_aps():
 
     class FakeAp:
         """Fake ap."""
-
         def __init__(self, score):
             self.score = score
 
@@ -98,8 +101,9 @@ async def test_results():
     async with AirodumpNg() as airodump:
         assert airodump.get_results() == {"aps": [], "clients": []}
         dir_ = airodump.tempdir.name + "/"
-        with tempfile.NamedTemporaryFile(
-                dir=dir_, prefix=airodump.uuid + "-", suffix=".csv") as named:
+        with tempfile.NamedTemporaryFile(dir=dir_,
+                                         prefix=airodump.uuid + "-",
+                                         suffix=".csv") as named:
             data = (
                 ('speed', 'A'),
                 ('channel', '2'),

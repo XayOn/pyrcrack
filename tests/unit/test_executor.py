@@ -69,11 +69,15 @@ async def test_run_async():
         await FakeExecutor().run(f="foo", y=True)
 
         try:
-            runmock.assert_called_with(
-                *['foobar', '-f', 'foo', '-y'], stderr=-1, stdin=-1, stdout=-1)
+            runmock.assert_called_with(*['foobar', '-f', 'foo', '-y'],
+                                       stderr=-1,
+                                       stdin=-1,
+                                       stdout=-1)
         except AssertionError:
-            runmock.assert_called_with(
-                *['foobar', '-y', '-f', "foo"], stderr=-1, stdin=-1, stdout=-1)
+            runmock.assert_called_with(*['foobar', '-y', '-f', "foo"],
+                                       stderr=-1,
+                                       stdin=-1,
+                                       stdout=-1)
 
 
 @pytest.mark.parametrize('in_,out', (('aircrack-ng', 'AircrackNg'),

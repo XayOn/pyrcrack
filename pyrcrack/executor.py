@@ -17,7 +17,6 @@ logging.basicConfig(level=logging.INFO)
 
 class Option:
     """Represents a single option (e.g, -e)."""
-
     def __init__(self, usage, word=None, value=None, logger=None):
         """Set option parameters."""
         self.usage = usage
@@ -66,7 +65,6 @@ class Option:
 
 class ExecutorHelper:
     """Abstract class interface to a shell command."""
-
     def __init__(self):
         """Set docstring."""
         if not self.__doc__:
@@ -120,8 +118,8 @@ class ExecutorHelper:
         Otherwise it will call asyncio.create_subprocess_exec()
         """
         self.logger.debug("Parsing options: %s", kwargs)
-        options = list((Option(self.usage, a, v, self.logger)
-                        for a, v in kwargs.items()))
+        options = list(
+            (Option(self.usage, a, v, self.logger) for a, v in kwargs.items()))
         self.logger.debug("Got options: %s", options)
 
         opts = [self.command] + list(args) + list(
