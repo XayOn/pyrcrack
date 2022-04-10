@@ -1,16 +1,21 @@
-"""Aidorump."""
+"""Airodump."""
 
-from glob import glob
+import os
 import asyncio
-import csv
-import io
+import xml
 from contextlib import suppress
 from .executor import ExecutorHelper
-from .models import AccessPoint, Client
+
+from async_timeout import timeout
+import xmltodict
+import dotmap
+
+from .models import Result
+from .models import AccessPoint
 
 
 class AirodumpNg(ExecutorHelper):
-    """Airodump-ng 1.3  - (C) 2006-2018 Thomas d'Otreppe
+    """Airodump-ng 1.6  - (C) 2006-2020 Thomas d'Otreppe
        https://www.aircrack-ng.org
 
        usage: airodump-ng <options> <interface>[,<interface>,...]
@@ -28,21 +33,24 @@ class AirodumpNg(ExecutorHelper):
            --berlin <secs>       : Time before removing the AP/client
                                    from the screen when no more packets
                                    are received (Default: 120 seconds)
-           -r <file>             : Read packets from that file
+           -r  <file>            : Read packets from that file
+           -T                    : While reading packets from a file,
+                                   simulate the arrival rate of them
+                                   as if they were "live".
            -x <msecs>            : Active Scanning Simulation
            --manufacturer        : Display manufacturer from IEEE OUI list
            --uptime              : Display AP Uptime from Beacon Timestamp
            --wps                 : Display WPS information (if any)
-           --output-format
-                       <formats> : Output format. Possible values:
-                                   pcap, ivs, csv, gps, kismet, netxml
+           --output-format <formats> : Output format. Possible values:
+                                       pcap, ivs, csv, gps, kismet, netxml,
+                                       logcsv
            --ignore-negative-one : Removes the message that says
                                    fixed channel <interface>: -1
-           --write-interval <seconds> : Output file(s) write
-                                        interval in seconds
+           --write-interval <seconds> : Output file(s) write interval in
+                                        seconds
            --background <enable> : Override background detection.
-
-       Filter options:
+           -n <int>              : Minimum AP packets recv'd before for
+                                   displaying it
            --encrypt <suite>     : Filter APs by cipher suite
            --netmask <netmask>   : Filter APs by mask
            --bssid <bssid>       : Filter APs by BSSID
@@ -50,9 +58,6 @@ class AirodumpNg(ExecutorHelper):
            --essid-regex <regex> : Filter APs by ESSID using a regular
                                    expression
            -a                    : Filter unassociated clients
-
-       By default, airodump-ng hop on 2.4GHz channels.
-       You can make it capture on other/specific channel(s) by using:
            --ht20                : Set channel to HT20 (802.11n)
            --ht40-               : Set channel to HT40- (802.11n)
            --ht40+               : Set channel to HT40+ (802.11n)
@@ -60,11 +65,7 @@ class AirodumpNg(ExecutorHelper):
            --band <abg>          : Band on which airodump-ng should hop
            -C <frequencies>      : Uses these frequencies in MHz to hop
            --cswitch <method>    : Set channel switching method
-                         0       : FIFO (default)
-                         1       : Round Robin
-                         2       : Hop on last
            -s                    : same as --cswitch
-
            --help                : Displays this usage screen
     """
     requires_tempfile = False
@@ -73,67 +74,68 @@ class AirodumpNg(ExecutorHelper):
 
     async def run(self, *args, **kwargs):
         """Run async, with prefix stablished as tempdir."""
+        self.execn += 1
+        kwargs['background'] = 1
         if not ('write' in kwargs or 'w' in kwargs):
             kwargs.pop('w', None)
             kwargs['write'] = self.tempdir.name + "/" + self.uuid
-        asyncio.create_task(self.result_updater())
+        if 'write_interval' not in kwargs:
+            kwargs['write_interval'] = 1
+
+        # Ensure kismet xml is going to be written
+        if kwargs.get('write-format', None) is not None:
+            kwargs['write-format'] = 'kismet,csv,logcsv'
+        elif kwargs.get('write-format') and 'kismet' not in kwargs.get(
+                'write-format', ''):
+            kwargs['write-format'] += ',kismet'
+
         return await super().run(*args, **kwargs)
 
-    async def result_updater(self):
-        """Set result on local object."""
-        while not self.proc:
-            await asyncio.sleep(1)
-        while self.proc.returncode is None:
-            self.meta['result'] = self.get_results()
-            await asyncio.sleep(2)
+    def get_file(self, format) -> str:
+        """Return csv file, not kismet one.
+
+        Arguments:
+
+            format: File extension to retrieve (kismet.csv kismet.xml csv
+                    log.csv or pcap)
+
+        Returns: full filename
+        """
+        return f"{self.tempdir.name}/{self.uuid}-{self.execn:02}.{format}"
 
     @property
-    def csv_file(self):
-        """Return csv file, not kismet one."""
-        glb = glob(self.tempdir.name + "/" + self.uuid + "-*.csv")
-        with suppress(StopIteration):
-            return next(a for a in glb if 'kismet' not in a)
+    async def results(self) -> list:
+        """Return a list of currently detected access points
 
-    def get_results(self):
-        """Return results at this moment."""
+        Returns: List of AccessPoint instances
+        """
+        file = self.get_file('kismet.netxml')
+        try:
+            # Wait for a sensible 3 seconds for netxml file to be generated and
+            # process to be running
+            async with timeout(3):
+                while not os.path.exists(file):
+                    await asyncio.sleep(1)
 
-        if not self.csv_file:
-            return {'clients': [], 'aps': []}
+                while not self.proc:
+                    # Check if airodump is running, otherwise wait more.
+                    await asyncio.sleep(1)
+        except asyncio.exceptions.TimeoutError:
+            # No file had been generated or process hadn't started in 3
+            # seconds.
+            raise Exception(await self.proc.communicate())
 
-        def clean(line):
-            """Format name."""
-            for name, value in line.items():
-                res = name.strip().lower().replace(' ', '_')
-                yield res.replace('#_', '').replace('-', '_'), value.strip()
+        while self.running:
+            # Avoid crashing on file creation
+            with suppress(ValueError, xml.parsers.expat.ExpatError):
+                xmla = xmltodict.parse(open(file).read())
+                dotmap_data = dotmap.DotMap(xmla)
+                results = dotmap_data['detection-run']['wireless-network']
+                if results:
+                    return Result(
+                        sorted([AccessPoint(ap) for ap in results],
+                               key=lambda x: x.score,
+                               reverse=True))
+                return []
 
-        def get_data(content):
-            """Read using a temporary csv file."""
-            with io.StringIO() as fio:
-                fio.write(content)
-                fio.seek(0)
-                for line in [c for c in csv.DictReader(fio, dialect='excel')]:
-                    yield dict(clean(line))
-
-        def get_clients(apoint, clients):
-            """Get clients for a specific ap."""
-            return [c for c in clients if c.bssid == apoint["bssid"]]
-
-        lines = open(self.csv_file).readlines()
-        inx = lines.index('Station MAC, First time seen, Last time seen,'
-                          ' Power, # packets, BSSID, Probed ESSIDs\n')
-
-        clients = ''.join([a for a in lines[inx:] if a.strip()])
-        clients = [Client(**d) for d in get_data(''.join(clients))]
-        aps = ''.join([a for a in lines[:inx] if a.strip()])
-        aps = [
-            AccessPoint(**d, clients=get_clients(d, clients))
-            for d in get_data(''.join(aps))
-        ]
-
-        return {'aps': aps, 'clients': clients}
-
-    def sorted_aps(self):
-        """Return sorted aps by score."""
-        return sorted(self.meta['result']['aps'],
-                      key=lambda x: x.score,
-                      reverse=True)
+            await asyncio.sleep(1)

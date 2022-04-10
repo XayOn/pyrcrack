@@ -4,7 +4,7 @@ from .executor import ExecutorHelper
 
 
 class AirbaseNg(ExecutorHelper):
-    """Airbase-ng 1.3  - (C) 2008-2018 Thomas d'Otreppe
+    """Airbase-ng 1.6  - (C) 2008-2020 Thomas d'Otreppe
     Original work: Martin Beck
     https://www.aircrack-ng.org
 
