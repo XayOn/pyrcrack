@@ -1,4 +1,7 @@
 """Aireplay-ng"""
+import asyncio
+
+from parse import parse
 
 from .executor import ExecutorHelper
 
@@ -60,3 +63,23 @@ class AireplayNg(ExecutorHelper):
     command = 'aireplay-ng'
     requires_tempfile = False
     requires_tempdir = False
+
+    async def run(self, *args, **kwargs):
+        """Run async, with prefix stablished as tempdir."""
+        asyncio.create_task(self.result_updater())
+        return await super().run(*args, **kwargs)
+
+    async def result_updater(self):
+        """Set result on local object."""
+        while not self.proc:
+            await asyncio.sleep(1)
+
+        while self.proc.returncode is None:
+            self.meta['result'] = list(await self.get_results())
+            await asyncio.sleep(2)
+
+    async def get_results(self):
+        """Get results list."""
+        results = (await self.proc.communicate())[0].decode()
+        res = (a for a in results.split('\n') if 'BSSID' in a)
+        return [parse("{date}  {message} -- BSSID: [{bssid}]", a) for a in res]
