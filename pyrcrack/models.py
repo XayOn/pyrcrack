@@ -2,13 +2,16 @@ import io
 import csv
 import re
 from rich.table import Table
+from parse import parse
 
 DICTS = ('WLAN_', 'JAZZTEL_', 'MOVISTAR_')
+APL_FMT = "{date}  Sending {attack} (code {num}) to {dest} -- BSSID: [{bssid}]"
 MONITOR_RE = re.compile(
     r'\t\t\((\w+) (\w+) mode vif (\w+) for \[\w+\](\w+) on \[\w+\](\w+)\)')
 
 
 class Result(list):
+
     @property
     def table(self):
         """Return a nicely formatted table with results."""
@@ -27,6 +30,7 @@ class Result(list):
 
 
 class Interface:
+
     def __init__(self, data, monitor_data):
         self.data = data
         for data in monitor_data:
@@ -73,6 +77,7 @@ class Interfaces(Result):
 
 
 class Client:
+
     def __init__(self, data):
         self.data = data
 
@@ -94,6 +99,7 @@ class AccessPoint(dict):
 
     Stores internal data in "data" property
     """
+
     def __init__(self, data):
         """Initialize an access point
 
@@ -184,3 +190,22 @@ class AccessPoint(dict):
     def __lt__(self, other):
         """Compare with score."""
         return self.score
+
+
+class AireplayResult(dict):
+    """Single aiplay result line"""
+
+    def __init__(self, *args, **kwargs):
+        self.update(parse(APL_FMT, kwargs.pop("_data")).named)
+        super().__init__(*args, **kwargs)
+
+    def asdict(self):
+        return self
+
+
+class AireplayResults(Result):
+    """Aireplay results."""
+
+    def __init__(self, data):
+        self.extend((AireplayResult(_data=a) for a in data.split('\n')
+                     if 'BSSID' in a))
