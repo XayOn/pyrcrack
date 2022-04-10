@@ -83,3 +83,9 @@ each 2 seconds.
 This snippet of code will produce the following results:
 
 .. image:: https://raw.githubusercontent.com/XayOn/pyrcrack/master/docs/scan.png
+
+
+Contributors
+-------------
+
+.. image:: https://contrib.rocks/image?repo=xayon/pyrcrack
