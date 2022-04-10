@@ -9,3 +9,11 @@
 
 Make sure you test anything before submitting a PR, and please, do not lower
 the coverage levels
+
+# Notes
+
+This is all subjective, and most PRs wich add any value will be probably
+merged. Don't be afraid to contribute!
+
+Artwork, testing (are you using pyrcrack on an opensource project? Give me a
+note!), etc are also good contributions.
