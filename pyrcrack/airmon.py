@@ -19,12 +19,23 @@ class AirmonNg(ExecutorHelper):
             assert any(a in args[0] for a in ('start', 'stop', 'check'))
         return await super().run(*args, **kwargs)
 
-    async def list_wifis(self):
-        """Return a list of wireless networks as advertised by airmon-zc"""
+    @staticmethod
+    def parse(res):
+        """Parse csv results"""
         with io.StringIO() as fileo:
-            await self.run()
-            res = await self.proc.communicate()
-            fileo.write(res[0].decode().strip().replace('\t\t', '\t'))
+            fileo.write(res.decode().strip().replace('\t\t', '\t'))
             fileo.seek(0)
             reader = csv.DictReader(fileo, dialect='excel-tab')
             return [{a.lower(): b for a, b in row.items()} for row in reader]
+
+    async def set_monitor(self, wifi, *args):
+        """Set monitor mode interface"""
+        await self.run('start', wifi, *args)
+        res = (await self.proc.communicate())[0].split(b'\n')
+        pos = res.index(b'PHY	Interface	Driver		Chipset')
+        return self.parse(b'\n'.join([a for a in res[pos:] if a]))
+
+    async def list_wifis(self):
+        """Return a list of wireless networks as advertised by airmon-zc"""
+        await self.run()
+        return self.parse((await self.proc.communicate())[0])

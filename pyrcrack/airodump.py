@@ -100,19 +100,19 @@ class AirodumpNg(ExecutorHelper):
         if not self.csv_file:
             return {'clients': [], 'aps': []}
 
-        def clean(name):
+        def clean(line):
             """Format name."""
-            res = name.strip().lower().replace(' ', '_')
-            return res.replace('#_', '').replace('-', '_')
+            for name, value in line.items():
+                res = name.strip().lower().replace(' ', '_')
+                yield res.replace('#_', '').replace('-', '_'), value.strip()
 
         def get_data(content):
             """Read using a temporary csv file."""
-            with io.StringIO() as fileo:
-                fileo.write(content)
-                fileo.seek(0)
-                reader = csv.DictReader(fileo, dialect='excel')
-                return [{clean(k): v.strip()
-                         for k, v in content.items()} for content in reader]
+            with io.StringIO() as fio:
+                fio.write(content)
+                fio.seek(0)
+                for line in [c for c in csv.DictReader(fio, dialect='excel')]:
+                    yield dict(clean(line))
 
         def get_clients(apoint, clients):
             """Get clients for a specific ap."""
@@ -131,3 +131,8 @@ class AirodumpNg(ExecutorHelper):
         ]
 
         return {'aps': aps, 'clients': clients}
+
+    def sorted_aps(self):
+        """Return sorted aps by score."""
+        return sorted(
+            self.meta['result']['aps'], key=lambda x: x.score, reverse=True)
