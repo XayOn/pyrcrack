@@ -1,7 +1,7 @@
 """Scan for targets and and pretty print some data."""
 import asyncio
 
-import pyrcrack
+from pyrcrack import AirmonNg, AirodumpNg, MONITOR
 
 from rich.console import Console
 from rich.prompt import Prompt
@@ -15,31 +15,35 @@ async def scan_for_targets():
     console = Console()
     console.clear()
     console.show_cursor(False)
-    airmon = pyrcrack.AirmonNg()
+    airmon = AirmonNg()
     interfaces = await airmon.interfaces
     console.print(interfaces.table)
     interface = Prompt.ask('Select an interface',
-                           choices=[a.interface for a in interfaces])
+                           choices=[str(a) for a in interfaces])
+    client = None
+    ap_ = None
 
-    async with airmon(interface) as mon:
-        async with pyrcrack.AirodumpNg() as pdump:
-            async for aps in pdump(mon.monitor_interface):
+    async with airmon(interface):
+        async with AirodumpNg() as pdump:
+            async for aps in pdump(MONITOR):
                 console.clear()
                 console.print(aps.table)
                 client = Prompt.ask(
                     'Select an AP',
                     choices=['continue', *[str(a) for a in range(len(aps))]])
-
                 if client != 'continue':
+                    ap_ = aps[int(client)]
                     break
 
-        async with pyrcrack.AirodumpNg() as pdump:
+        if not ap_:
+            return
+
+        async with AirodumpNg() as pdump:
             console.print(
                 ":vampire:",
-                f"Selected client: [red] {aps[int(client)].bssid} [/red]")
+                f"Selected client: [red] {ap_.bssid} [/red]")
 
-            async for result in pdump(mon.monitor_interface,
-                                      **aps[int(client)].airodump):
+            async for result in pdump(MONITOR, **ap_.airodump):
                 console.clear()
                 console.print(result.table)
                 await asyncio.sleep(3)
