@@ -120,7 +120,10 @@ class AirodumpNg(ExecutorHelper):
         except asyncio.exceptions.TimeoutError:
             # No file had been generated or process hadn't started in 3
             # seconds.
-            raise Exception(await self.proc.communicate())
+            res = "Unknown"
+            if self.proc:
+                res = await self.proc.communicate()
+            raise Exception('\n'.join([a.decode() for a in res]))
 
         while self.running:
             # Avoid crashing on file creation
@@ -139,3 +142,4 @@ class AirodumpNg(ExecutorHelper):
                 return Result([])
 
             await asyncio.sleep(1)
+        return Result([])

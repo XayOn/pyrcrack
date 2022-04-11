@@ -17,6 +17,7 @@ logging.basicConfig(level=logging.INFO)
 
 class Option:
     """Represents a single option (e.g, -e)."""
+
     def __init__(self, usage, word=None, value=None, logger=None):
         """Set option parameters."""
         self.usage = usage
@@ -65,6 +66,7 @@ class Option:
 
 class ExecutorHelper:
     """Abstract class interface to a shell command."""
+
     def __init__(self):
         """Set docstring."""
         if not self.__doc__:

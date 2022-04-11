@@ -41,15 +41,25 @@ class Interface:
     def interface(self):
         return self.data['interface']
 
+    def __eq__(self, other):
+        if isinstance(other, Interface):
+            return other.interface == self.interface
+        return self.interface == other
+
     @property
     def monitor(self):
-        return self.data['interface']
+        return self.data.get('monitor', {}).get('interface',
+                                                self.data['interface'])
 
     def asdict(self):
         return self.data
 
+    def __str__(self):
+        return self.interface
+
 
 class Interfaces(Result):
+
     def __init__(self, data):
         if data == [b'Run it as root']:
             raise Exception('Pyrcrack must be run as root')

