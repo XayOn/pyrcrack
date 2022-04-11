@@ -1,9 +1,8 @@
 """Aireplay-ng"""
 import asyncio
 
-from parse import parse
-
 from .executor import ExecutorHelper
+from .models import AireplayResults
 
 
 class AireplayNg(ExecutorHelper):
@@ -69,17 +68,23 @@ class AireplayNg(ExecutorHelper):
         asyncio.create_task(self.result_updater())
         return await super().run(*args, **kwargs)
 
+    @property
+    async def results(self):
+        return self.meta.get('result', AireplayResults(''))
+
     async def result_updater(self):
         """Set result on local object."""
+        # TODO: There might be a situation here where proc is never != None.
+        # This should have some timeout logic as airodump has
         while not self.proc:
             await asyncio.sleep(1)
 
         while self.proc.returncode is None:
-            self.meta['result'] = list(await self.get_results())
+            self.meta['result'] = await self.get_results()
             await asyncio.sleep(2)
 
     async def get_results(self):
         """Get results list."""
-        results = (await self.proc.communicate())[0].decode()
-        res = (a for a in results.split('\n') if 'BSSID' in a)
-        return [parse("{date}  {message} -- BSSID: [{bssid}]", a) for a in res]
+        if not self.proc:
+            return AireplayResults('')
+        return AireplayResults((await self.proc.communicate())[0].decode())
