@@ -11,6 +11,8 @@ import tempfile
 import uuid
 import docopt
 import stringcase
+from contextlib import suppress
+from contextvars import ContextVar
 
 logging.basicConfig(level=logging.INFO)
 
@@ -78,6 +80,8 @@ class ExecutorHelper:
         self.proc = None
         self.meta = {}
         self.debug = os.getenv('PYRCRACK_DEBUG', '') == 1
+        self.tempfile = None
+        self.tempdir = None
         if self.requires_tempfile:
             self.tempfile = tempfile.NamedTemporaryFile()
         elif self.requires_tempdir:
@@ -121,6 +125,9 @@ class ExecutorHelper:
 
         Otherwise it will call asyncio.create_subprocess_exec()
         """
+        if not self.command:
+            raise Exception("Subclassing error, please specify a base cmd")
+
         self.logger.debug("Parsing options: %s", kwargs)
         options = list(
             (Option(self.usage, a, v, self.logger) for a, v in kwargs.items()))
@@ -132,11 +139,27 @@ class ExecutorHelper:
         self.logger.debug("Running command: %s", opts)
         return opts
 
+    @staticmethod
+    def resolve(val):
+        """Force string conversion
+
+        - In case an Interface object comes on args
+        - In case a contextvar comes, retrieve its value
+        """
+        # I'm a little conflicted on this one, as it seems dirty to cast
+        # everything to string
+        # Yet, I'm letting it go like this because in the end, this is a
+        # subprocess call that requires all args to be strings or bytes...
+        # This will also allow us to use an AP object in a future.
+        if isinstance(val, ContextVar):
+            return str(val.get())
+        return str(val)
+
     async def run(self, *args, **kwargs):
         """Run asynchronously."""
         opts = self._run(*args, **kwargs)
         self.proc = await asyncio.create_subprocess_exec(
-            *opts,
+            *[self.resolve(a) for a in opts],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
@@ -156,17 +179,28 @@ class ExecutorHelper:
             self.called = True
             self.proc = await self.run(*self.run_args[0], **self.run_args[1])
 
+        current_results = await self.results
+
         if not self.running:
+            # If we haven't sent the latests results, send them now.
+            if self.last_results != current_results:
+                self.last_results = current_results
+                return current_results
             raise StopAsyncIteration
 
-        return await self.results
+        self.last_results = current_results
+        return self.last_results
 
     @property
     def running(self):
+        if not self.proc:
+            return False
         return self.proc.returncode is None
 
     async def readlines(self):
         """Return lines as per proc.communicate, non-empty ones."""
+        if not self.proc:
+            return []
         com = await self.proc.communicate()
         return [a for a in com[0].split(b'\n') if a]
 
@@ -174,25 +208,29 @@ class ExecutorHelper:
     async def results(self):
         return [self.proc]
 
-    async def __aexit__(self, *args, **kwargs):
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
         """Clean up conext manager."""
-        if self.requires_tempfile:
-            if self.debug:
-                self.logger.error(f'Debug mode, not deleting {self.tempfile}')
-            else:
-                self.tempfile.__exit__(*args, **kwargs)
-        elif self.requires_tempdir:
-            if self.debug:
-                self.logger.error(f'Debug mode, not deleting {self.tempdir}')
-            else:
-                self.tempdir.__exit__(*args, **kwargs)
-        self.proc.kill()
+        if self.debug and (self.requires_tempfile or self.requires_tempdir):
+            self.logger.error(f'Not deleting {self.tempfile}, {self.tempdir}')
+
+        if self.tempfile:
+            self.tempfile.__exit__(exc_type, exc_val, exc_tb)
+
+        if self.tempdir:
+            self.tempdir.__exit__(exc_type, exc_val, exc_tb)
+
+        if exc_type in (ProcessLookupError, subprocess.CalledProcessError):
+            return True
+
+        if self.proc:
+            with suppress(Exception):
+                self.proc.kill()
 
     async def __aenter__(self):
         """Create temporary directories and files if required."""
-        if self.requires_tempfile:
+        if self.requires_tempfile and self.tempfile:
             self.tempfile.__enter__()
-        elif self.requires_tempdir:
+        elif self.requires_tempdir and self.tempdir:
             self.tempdir.__enter__()
         return self
 
