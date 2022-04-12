@@ -27,3 +27,4 @@ class AirdecapNg(ExecutorHelper):
     sync = False
     requires_tempfile = False
     requires_tempdir = False
+    requires_root = False

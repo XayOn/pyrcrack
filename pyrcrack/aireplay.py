@@ -62,6 +62,7 @@ class AireplayNg(ExecutorHelper):
     command = 'aireplay-ng'
     requires_tempfile = False
     requires_tempdir = False
+    requires_root = True
 
     async def run(self, *args, **kwargs):
         """Run async, with prefix stablished as tempdir."""
