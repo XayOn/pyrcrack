@@ -17,6 +17,7 @@ def test_helpstr_extraction():
             command = "foobar"
             requires_tempfile = False
             requires_tempdir = False
+            requires_root = False
 
         assert FakeExecutor().helpstr == 'test'
         mock.assert_called_with("foobar 2>&1; echo", shell=True)
@@ -42,6 +43,7 @@ def test_usage():
             command = "foobar"
             requires_tempfile = False
             requires_tempdir = False
+            requires_root = False
 
         assert FakeExecutor().usage == {'-f': False, '-y': True}
 
@@ -65,6 +67,7 @@ async def test_run_async():
             command = "foobar"
             requires_tempfile = False
             requires_tempdir = False
+            requires_root = False
 
         await FakeExecutor().run(f="foo", y=True)
 

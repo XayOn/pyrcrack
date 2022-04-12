@@ -95,10 +95,11 @@ class ExecutorHelper:
             self.tempfile = tempfile.NamedTemporaryFile()
         elif self.requires_tempdir:
             self.tempdir = tempfile.TemporaryDirectory()
-        if self.requires_root:
+        if self.requires_root and not os.getenv("SKIP_ROOT_CHECK"):
             if os.geteuid() != 0:
                 raise Exception("Must be run as root")
-        check()
+        if not os.getenv('SKIP_VERSION_CHECK'):
+            check()
 
     @property
     @functools.lru_cache()
