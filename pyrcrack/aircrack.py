@@ -57,6 +57,7 @@ class AircrackNg(ExecutorHelper):
     command = "aircrack-ng"
     requires_tempfile = True
     requires_tempdir = False
+    requires_root = False
 
     async def run(self, *args, **kwargs):
         if self.tempfile:
@@ -65,5 +66,7 @@ class AircrackNg(ExecutorHelper):
 
     async def get_result(self):
         """Read tempfile (write key result)"""
-        await self.proc.wait()
-        return self.tempfile.read()
+        if self.proc:
+            await self.proc.wait()
+        if self.tempfile:
+            return self.tempfile.read()

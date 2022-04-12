@@ -69,6 +69,7 @@ class AirodumpNg(ExecutorHelper):
     """
     requires_tempfile = False
     requires_tempdir = True
+    requires_root = True
     command = "airodump-ng"
 
     async def run(self, *args, **kwargs):

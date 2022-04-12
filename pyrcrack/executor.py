@@ -1,7 +1,6 @@
 """Pyrcrack-ng Executor helper."""
 
 import os
-import abc
 import asyncio
 import functools
 import itertools
@@ -66,8 +65,18 @@ class Option:
         return f"Option(<{self.parsed}>, {self.is_short}, {self.expects_args})"
 
 
+def check():
+    """Check if aircrack-ng is compatible."""
+    assert b'Aircrack-ng 1.6' in subprocess.check_output(
+        ['aircrack-ng', '--help'])
+
+
 class ExecutorHelper:
     """Abstract class interface to a shell command."""
+    requires_tempfile = False
+    requires_tempdir = False
+    requires_root = True
+    command = ''
 
     def __init__(self):
         """Set docstring."""
@@ -86,18 +95,11 @@ class ExecutorHelper:
             self.tempfile = tempfile.NamedTemporaryFile()
         elif self.requires_tempdir:
             self.tempdir = tempfile.TemporaryDirectory()
-
-    @abc.abstractproperty
-    def requires_tempfile(self):
-        """Synchronous mode."""
-
-    @abc.abstractproperty
-    def requires_tempdir(self):
-        """Synchronous mode."""
-
-    @abc.abstractproperty
-    def command(self):
-        """Specify command to execute."""
+        if self.requires_root and not os.getenv("SKIP_ROOT_CHECK"):
+            if os.geteuid() != 0:
+                raise Exception("Must be run as root")
+        if not os.getenv('SKIP_VERSION_CHECK'):
+            check()
 
     @property
     @functools.lru_cache()

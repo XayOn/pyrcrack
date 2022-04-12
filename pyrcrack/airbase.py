@@ -50,3 +50,4 @@ class AirbaseNg(ExecutorHelper):
     command = 'airbase-ng'
     requires_tempfile = False
     requires_tempdir = False
+    requires_root = True
