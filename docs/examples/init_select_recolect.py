@@ -1,4 +1,4 @@
-"""Scan for targets and and pretty print some data."""
+"""Scan for targets and pretty print some data."""
 import asyncio
 
 from pyrcrack import AirmonNg, AirodumpNg, MONITOR
