@@ -2,9 +2,9 @@ name: test
 
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, develop, feature/migrate_to_hatch]
   pull_request:
-    branches: [main, master]
+    branches: [main, master, develop]
 
 concurrency:
   group: test-${{ github.head_ref }}
