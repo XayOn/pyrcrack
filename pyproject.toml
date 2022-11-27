@@ -1,36 +1,78 @@
-[tool.poetry]
-name = "pyrcrack"
-version = "1.1.2"
-description = "Pythonic aircrack-ng bindings"
-license = "MIT"
-authors = ["David Francos <opensource@davidfrancos.net>"]
-readme = 'Readme.rst'
-
-[tool.poetry.dependencies]
-python = "^3.8"
-stringcase = "^1"
-docopt = "^0.6"
-async-timeout = "^3"
-parse = "^1.12"
-pytest-asyncio = "^0.14"
-geopy = "^2"
-mac-vendor-lookup = "^0.1"
-pyshark = "^0.4"
-xmltodict = "^0.12"
-dotmap = "^1"
-rich = "^7"
-
-[tool.poetry.dev-dependencies]
-pytest-flake8 = "^1"
-pycodestyle = "^2"
-pytest-cov = "^2"
-asynctest = "^0.12"
-pydocstyle = "^3"
-sphinx = "^2"
-behave = "^1"
-yapf = "^0.30"
-gitchangelog = "^3.0"
-
 [build-system]
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"
+requires = ["hatchling", "hatch-vcs", "hatch-fancy-pypi-readme"]
+
+build-backend = "hatchling.build"
+
+[project]
+name = "pyrcrack"
+description = "Pythonic aircrack-ng bindings"
+readme = "README.md"
+requires-python = ">=3.7"
+license = "GPL-3.0"
+keywords = []
+authors = [{ name = "David Francos", email = "me@davidfrancos.net" }]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = [
+    "stringcase>=1",
+    "docopt>=0.6",
+    "async-timeout>=3",
+    "parse>=1.12",
+    "pytest-asyncio>=0.14",
+    "geopy>=2",
+    "mac-vendor-lookup>=0.1",
+    "pyshark>=0.4",
+    "xmltodict>=0.12",
+    "dotmap>=1",
+    "rich>=7",
+]
+dynamic = ["version"]
+
+[project.urls]
+Documentation = "https://github.com/XayOn/pyrcrack#readme"
+Issues = "https://github.com/XayOn/pyrcrack/issues"
+Source = "https://github.com/XayOn/pyrcrack"
+
+[tool.hatch.version]
+path = "pyrcrack/__about__.py"
+
+[tool.hatch.envs.default]
+dependencies = [
+    "pytest",
+    "asynctest",
+    "pytest-cov",
+    "pydocstyle",
+    "behave",
+    "pytest-asyncio",
+    "mkdocs",
+    "mkdocs-material",
+    "ruff"
+]
+
+[tool.hatch.metadata.hooks.fancy-pypi-readme]
+content-type = "text/markdown"
+fragments = [{ path = "README.md" }, { path = "CHANGES.md" }]
+
+[tool.hatch.envs.default.scripts]
+cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=pyrcrack --cov=tests {args}"
+no-cov = "cov --no-cov {args}"
+
+[[tool.hatch.envs.test.matrix]]
+python = ["37", "38", "39", "310", "311"]
+
+[tool.coverage.run]
+branch = true
+parallel = true
+omit = ["pyrcrack/__about__.py"]
+
+[tool.coverage.report]
+exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]
