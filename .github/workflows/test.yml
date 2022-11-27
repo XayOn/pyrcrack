@@ -36,7 +36,7 @@ jobs:
       run: pip install --upgrade hatch
 
     - name: Deploy docs
-      run: mkdocs gh-deploy --force
+      run: hatch run mkdocs gh-deploy --force
   run:
     name: Python ${{ matrix.python-version }} on ${{ startsWith(matrix.os, 'macos-') && 'macOS' || startsWith(matrix.os, 'windows-') && 'Windows' || 'Linux' }}
     runs-on: ${{ matrix.os }}
