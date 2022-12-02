@@ -1,9 +1,12 @@
-from behave import when, then
+from behave import then, when
 
 
-@when('I import the package pyrcrack')
+@when("I import the package pyrcrack")
 def import_package(context):
-    """Try to import the package. If an exception happened push to context."""
+    """Try to import the package.
+
+    If an exception happened push to context.
+    """
     context.exceptions = []
     try:
         import pyrcrack  # noqa
@@ -11,7 +14,7 @@ def import_package(context):
         context.exceptions = [excp]
 
 
-@then('I see no errors')
+@then("I see no errors")
 def no_exceptions_in_context(context):
     """Check that no previous exceptions have been captured."""
     assert not context.exceptions

@@ -1,13 +1,14 @@
-import io
 import csv
+import io
 import re
-from rich.table import Table
-from parse import parse
 
-DICTS = ('WLAN_', 'JAZZTEL_', 'MOVISTAR_')
+from parse import parse
+from rich.table import Table
+
+DICTS = ("WLAN_", "JAZZTEL_", "MOVISTAR_")
 APL_FMT = "{date}  Sending {attack} (code {num}) to {dest} -- BSSID: [{bssid}]"
 MONITOR_RE = re.compile(
-    r'\t\t\((\w+) (\w+) mode vif (\w+) for \[\w+\](\w+) on \[\w+\](\w+)\)')
+    r"\t\t\((\w+) (\w+) mode vif (\w+) for \[\w+\](\w+) on \[\w+\](\w+)\)")
 
 
 class Result(list):
@@ -16,7 +17,7 @@ class Result(list):
     def table(self):
         """Return a nicely formatted table with results."""
         table = Table(show_header=True,
-                      header_style='bold magenta',
+                      header_style="bold magenta",
                       show_footer=False)
         if self:
             keys = self[0].asdict().keys()
@@ -34,12 +35,12 @@ class Interface:
     def __init__(self, data, monitor_data):
         self.data = data
         for data in monitor_data:
-            if data['original_interface'] == self.data['interface']:
-                self.data[data['mode']] = data
+            if data["original_interface"] == self.data["interface"]:
+                self.data[data["mode"]] = data
 
     @property
     def interface(self):
-        return self.data['interface']
+        return self.data["interface"]
 
     def __eq__(self, other):
         if isinstance(other, Interface):
@@ -48,8 +49,8 @@ class Interface:
 
     @property
     def monitor(self):
-        return self.data.get('monitor', {}).get('interface',
-                                                self.data['interface'])
+        return self.data.get("monitor", {}).get("interface",
+                                                self.data["interface"])
 
     def asdict(self):
         return self.data
@@ -61,28 +62,28 @@ class Interface:
 class Interfaces(Result):
 
     def __init__(self, data):
-        if data == [b'Run it as root']:
-            raise Exception('Pyrcrack must be run as root')
-        pos = data.index(b'PHY	Interface	Driver		Chipset')
-        ifaces_data = self.parse(b'\n'.join(
-            [a for a in data[pos:] if a and not a.startswith(b'\t\t')]))
+        if data == [b"Run it as root"]:
+            raise Exception("Pyrcrack must be run as root")
+        pos = data.index(b"PHY	Interface	Driver		Chipset")
+        ifaces_data = self.parse(b"\n".join(
+            [a for a in data[pos:] if a and not a.startswith(b"\t\t")]))
         monitor_data = filter(lambda x: MONITOR_RE.match(x.decode()),
                               data[pos + len(ifaces_data):])
 
         def groups(data):
             return MONITOR_RE.match(data.decode()).groups()
 
-        keys = ['driver', 'mode', 'status', 'original_interface', 'interface']
+        keys = ["driver", "mode", "status", "original_interface", "interface"]
         monitor_data = [dict(zip(keys, groups(a))) for a in monitor_data]
         self.extend([Interface(a, monitor_data) for a in ifaces_data])
 
     @staticmethod
     def parse(res):
-        """Parse csv results"""
+        """Parse csv results."""
         with io.StringIO() as fileo:
-            fileo.write(res.decode().strip().replace('\t\t', '\t'))
+            fileo.write(res.decode().strip().replace("\t\t", "\t"))
             fileo.seek(0)
-            reader = csv.DictReader(fileo, dialect='excel-tab')
+            reader = csv.DictReader(fileo, dialect="excel-tab")
             return [{a.lower(): b for a, b in row.items()} for row in reader]
 
 
@@ -93,7 +94,7 @@ class Client:
 
     @property
     def bssid(self):
-        return self.data['client-mac']
+        return self.data["client-mac"]
 
     @property
     def packets(self):
@@ -101,7 +102,7 @@ class Client:
 
     @property
     def dbm(self):
-        return self.data['snr-info'].last_signal_dbm
+        return self.data["snr-info"].last_signal_dbm
 
 
 class AccessPoint(dict):
@@ -111,7 +112,7 @@ class AccessPoint(dict):
     """
 
     def __init__(self, data):
-        """Initialize an access point
+        """Initialize an access point.
 
         Arguments:
 
@@ -125,7 +126,7 @@ class AccessPoint(dict):
 
     @property
     def airodump(self):
-        return {'channel': self.channel, 'bssid': self.bssid}
+        return {"channel": self.channel, "bssid": self.bssid}
 
     @property
     def channel(self):
@@ -143,10 +144,10 @@ class AccessPoint(dict):
 
             List of Client instance.
         """
-        if isinstance(self.data['wireless-client'], list):
-            return [Client(d) for d in self.data['wireless-client']]
+        if isinstance(self.data["wireless-client"], list):
+            return [Client(d) for d in self.data["wireless-client"]]
         else:
-            return [Client(self.data['wireless-client'])]
+            return [Client(self.data["wireless-client"])]
 
     @property
     def total_packets(self):
@@ -154,19 +155,19 @@ class AccessPoint(dict):
 
     def asdict(self):
         return {
-            'essid': self.essid,
-            'bssid': self.bssid,
-            'packets': str(self.total_packets),
-            'dbm': str(self.dbm),
-            'score': str(self.score),
-            'channel': str(self.channel),
-            'encryption': '/'.join(self.encryption)
+            "essid": self.essid,
+            "bssid": self.bssid,
+            "packets": str(self.total_packets),
+            "dbm": str(self.dbm),
+            "score": str(self.score),
+            "channel": str(self.channel),
+            "encryption": "/".join(self.encryption),
         }
 
     @property
     def essid(self):
-        """Essid"""
-        return self.data.SSID.essid.get('#text', '')
+        """Essid."""
+        return self.data.SSID.essid.get("#text", "")
 
     @property
     def bssid(self):
@@ -177,14 +178,14 @@ class AccessPoint(dict):
     def score(self):
         """Score, used to sort networks.
 
-        Score will take in account the total packets received, the dbm and if a
-        ssid is susceptible to have dictionaries.
+        Score will take in account the total packets received, the dbm
+        and if a ssid is susceptible to have dictionaries.
         """
         packet_score = int(self.total_packets)
         dbm_score = -int(self.dbm)
         dict_score = bool(any(self.essid.startswith(a) for a in DICTS))
         name_score = -1000 if not self.essid else 0
-        enc_score = 1000 if 'WEP' in self.encryption else 0
+        enc_score = 1000 if "WEP" in self.encryption else 0
         return packet_score + dbm_score + dict_score + name_score + enc_score
 
     @property
@@ -194,8 +195,8 @@ class AccessPoint(dict):
 
     @property
     def dbm(self):
-        """Return dbm info"""
-        return self.data['snr-info'].last_signal_dbm
+        """Return dbm info."""
+        return self.data["snr-info"].last_signal_dbm
 
     def __lt__(self, other):
         """Compare with score."""
@@ -203,7 +204,7 @@ class AccessPoint(dict):
 
 
 class AireplayResult(dict):
-    """Single aiplay result line"""
+    """Single aiplay result line."""
 
     def __init__(self, *args, **kwargs):
         self.update(parse(APL_FMT, kwargs.pop("_data")).named)
@@ -217,5 +218,5 @@ class AireplayResults(Result):
     """Aireplay results."""
 
     def __init__(self, data):
-        self.extend((AireplayResult(_data=a) for a in data.split('\n')
-                     if 'BSSID' in a))
+        self.extend((AireplayResult(_data=a) for a in data.split("\n")
+                     if "BSSID" in a))

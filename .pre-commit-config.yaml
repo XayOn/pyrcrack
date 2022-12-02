@@ -1,0 +1,29 @@
+files: "(.*).py"
+exclude: "docker/(.*)"
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.3.0
+  hooks:
+  - id: trailing-whitespace
+  - id: check-docstring-first
+  - id: check-added-large-files
+  - id: check-yaml
+  - id: debug-statements
+  - id: check-merge-conflict
+  - id: end-of-file-fixer
+- hooks:
+  - id: check-hooks-apply
+  - id: check-useless-excludes
+  repo: meta
+- repo: https://github.com/commitizen-tools/commitizen
+  rev: v2.35.0
+  hooks:
+  - id: commitizen
+- repo: https://github.com/PyCQA/docformatter
+  rev: v1.5.0
+  hooks:
+  - id: docformatter
+- repo: https://github.com/charliermarsh/ruff-pre-commit
+  rev: v0.0.150
+  hooks:
+    - id: ruff

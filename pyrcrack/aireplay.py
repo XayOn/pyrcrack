@@ -1,4 +1,4 @@
-"""Aireplay-ng"""
+"""Aireplay-ng."""
 import asyncio
 
 from .executor import ExecutorHelper
@@ -6,7 +6,7 @@ from .models import AireplayResults
 
 
 class AireplayNg(ExecutorHelper):
-    """ Aireplay-ng 1.6  - (C) 2006-2020 Thomas d'Otreppe
+    """Aireplay-ng 1.6  - (C) 2006-2020 Thomas d'Otreppe
     https://www.aircrack-ng.org
 
     Usage: aireplay-ng <options> <replay interface>
@@ -59,7 +59,7 @@ class AireplayNg(ExecutorHelper):
         --help              : Displays this usage screen
     """
 
-    command = 'aireplay-ng'
+    command = "aireplay-ng"
     requires_tempfile = False
     requires_tempdir = False
     requires_root = True
@@ -71,7 +71,7 @@ class AireplayNg(ExecutorHelper):
 
     @property
     async def results(self):
-        return self.meta.get('result', AireplayResults(''))
+        return self.meta.get("result", AireplayResults(""))
 
     async def result_updater(self):
         """Set result on local object."""
@@ -81,11 +81,11 @@ class AireplayNg(ExecutorHelper):
             await asyncio.sleep(1)
 
         while self.proc.returncode is None:
-            self.meta['result'] = await self.get_results()
+            self.meta["result"] = await self.get_results()
             await asyncio.sleep(2)
 
     async def get_results(self):
         """Get results list."""
         if not self.proc:
-            return AireplayResults('')
+            return AireplayResults("")
         return AireplayResults((await self.proc.communicate())[0].decode())

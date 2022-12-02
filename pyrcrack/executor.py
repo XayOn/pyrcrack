@@ -1,17 +1,18 @@
 """Pyrcrack-ng Executor helper."""
-
-import os
 import asyncio
 import functools
 import itertools
 import logging
+import os
 import subprocess
 import tempfile
 import uuid
-import docopt
-import stringcase
+import warnings
 from contextlib import suppress
 from contextvars import ContextVar
+
+import docopt
+import stringcase
 
 logging.basicConfig(level=logging.INFO)
 
@@ -32,16 +33,16 @@ class Option:
         self.logger.debug("Parsing option %s:%s", self.word, self.value)
 
     @property
-    @functools.lru_cache()
+    @functools.lru_cache  # noqa: B019
     def formatted(self):
         """Format given option acording to definition."""
-        result = (Option.short(self.word)
-                  if self.is_short else Option.long(self.word))
+        result = Option.short(self.word) if self.is_short else Option.long(
+            self.word)
 
         if self.usage.get(result):
             return result
 
-        sword = self.word.replace('_', '-')
+        sword = self.word.replace("_", "-")
         return Option.short(sword) if self.is_short else Option.long(sword)
 
     @staticmethod
@@ -67,16 +68,22 @@ class Option:
 
 def check():
     """Check if aircrack-ng is compatible."""
-    assert b'Aircrack-ng 1.6' in subprocess.check_output(
-        ['aircrack-ng', '--help'])
+    ver_check = subprocess.check_output(["aircrack-ng", "--help"])
+    if b"Aircrack-ng 1.6" not in ver_check:
+        if b"Aircrack-ng 1.7" not in ver_check:
+            raise Exception("Unsupported Aircrack-ng detected")
+        else:
+            warnings.warn(
+                "Aircrack-ng 1.7 detected, some features may not work")
 
 
 class ExecutorHelper:
     """Abstract class interface to a shell command."""
+
     requires_tempfile = False
     requires_tempdir = False
     requires_root = True
-    command = ''
+    command = ""
 
     def __init__(self):
         """Set docstring."""
@@ -88,7 +95,7 @@ class ExecutorHelper:
         self.logger = logging.getLogger(self.__class__.__name__)
         self.proc = None
         self.meta = {}
-        self.debug = os.getenv('PYRCRACK_DEBUG', '') == 1
+        self.debug = os.getenv("PYRCRACK_DEBUG", "") == 1
         self.tempfile = None
         self.tempdir = None
         if self.requires_tempfile:
@@ -98,23 +105,23 @@ class ExecutorHelper:
         if self.requires_root and not os.getenv("SKIP_ROOT_CHECK"):
             if os.geteuid() != 0:
                 raise Exception("Must be run as root")
-        if not os.getenv('SKIP_VERSION_CHECK'):
+        if not os.getenv("SKIP_VERSION_CHECK"):
             check()
 
     @property
-    @functools.lru_cache()
+    @functools.lru_cache  # noqa: B019
     def helpstr(self):
         """Extract help string for current command."""
-        helpcmd = '{} 2>&1; echo'.format(self.command)
+        helpcmd = "{} 2>&1; echo".format(self.command)
         return subprocess.check_output(helpcmd, shell=True).decode()
 
     @property
-    @functools.lru_cache()
+    @functools.lru_cache  # noqa: B019
     def usage(self):
         """Extract usage from a specified command.
 
-        This is useful if usage not defined in subclass, but it is recommended
-        to define them there.
+        This is useful if usage not defined in subclass, but it is
+        recommended to define them there.
         """
         opt = docopt.parse_defaults(self.__doc__)
         return dict({a.short or a.long: bool(a.argcount) for a in opt})
@@ -131,19 +138,20 @@ class ExecutorHelper:
             raise Exception("Subclassing error, please specify a base cmd")
 
         self.logger.debug("Parsing options: %s", kwargs)
-        options = list(
-            (Option(self.usage, a, v, self.logger) for a, v in kwargs.items()))
+        options = [
+            Option(self.usage, a, v, self.logger) for a, v in kwargs.items()
+        ]
         self.logger.debug("Got options: %s", options)
 
-        opts = [self.command] + list(args) + list(
-            itertools.chain(*(o.parsed for o in options)))
+        opts = ([self.command] + list(args) +
+                list(itertools.chain(*(o.parsed for o in options))))
 
         self.logger.debug("Running command: %s", opts)
         return opts
 
     @staticmethod
     def resolve(val):
-        """Force string conversion
+        """Force string conversion.
 
         - In case an Interface object comes on args
         - In case a contextvar comes, retrieve its value
@@ -164,7 +172,8 @@ class ExecutorHelper:
             *[self.resolve(a) for a in opts],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE)
+            stderr=subprocess.PIPE,
+        )
         return self.proc
 
     def __call__(self, *args, **kwargs):
@@ -204,7 +213,7 @@ class ExecutorHelper:
         if not self.proc:
             return []
         com = await self.proc.communicate()
-        return [a for a in com[0].split(b'\n') if a]
+        return [a for a in com[0].split(b"\n") if a]
 
     @property
     async def results(self):
@@ -213,7 +222,7 @@ class ExecutorHelper:
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         """Clean up conext manager."""
         if self.debug and (self.requires_tempfile or self.requires_tempdir):
-            self.logger.error(f'Not deleting {self.tempfile}, {self.tempdir}')
+            self.logger.error(f"Not deleting {self.tempfile}, {self.tempdir}")
 
         if self.tempfile:
             self.tempfile.__exit__(exc_type, exc_val, exc_tb)
@@ -239,4 +248,4 @@ class ExecutorHelper:
 
 def stc(command):
     """Convert snake case to camelcase in class format."""
-    return stringcase.pascalcase(command.replace('-', '_'))
+    return stringcase.pascalcase(command.replace("-", "_"))

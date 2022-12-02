@@ -4,7 +4,7 @@ from .executor import ExecutorHelper
 
 
 class AirdecloackNg(ExecutorHelper):
-    """ Airdecloak-ng 1.6  - (C) 2008-2020 Thomas d'Otreppe
+    """Airdecloak-ng 1.6  - (C) 2008-2020 Thomas d'Otreppe
     https://www.aircrack-ng.org
     Available filters::
 
@@ -38,6 +38,7 @@ class AirdecloackNg(ExecutorHelper):
        --drop-frag           : Drop fragmented packets
        --help                : Displays this usage screen
     """
+
     command = "airdecloack-ng"
     requires_tempfile = False
     requires_tempdir = False

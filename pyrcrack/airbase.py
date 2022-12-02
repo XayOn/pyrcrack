@@ -1,7 +1,5 @@
 """Airbase-ng."""
 
-
-
 from .executor import ExecutorHelper
 
 
@@ -49,7 +47,8 @@ class AirbaseNg(ExecutorHelper):
         --essids <file>  : read a list of ESSIDs out of that file
         --help           : Displays this usage screen
     """
-    command = 'airbase-ng'
+
+    command = "airbase-ng"
     requires_tempfile = False
     requires_tempdir = False
     requires_root = True
