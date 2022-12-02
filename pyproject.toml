@@ -1,7 +1,7 @@
 [build-system]
-requires = ["hatchling", "hatch-vcs", "hatch-fancy-pypi-readme"]
-
+requires = ["hatchling", "hatch-fancy-pypi-readme"]
 build-backend = "hatchling.build"
+
 
 [project]
 name = "pyrcrack"
@@ -43,7 +43,7 @@ Issues = "https://github.com/XayOn/pyrcrack/issues"
 Source = "https://github.com/XayOn/pyrcrack"
 
 [tool.hatch.version]
-path = "pyrcrack/__about__.py"
+path = "pyrcrack/__init__.py"
 
 [tool.hatch.envs.default]
 dependencies = [
@@ -76,3 +76,13 @@ omit = ["pyrcrack/__about__.py"]
 
 [tool.coverage.report]
 exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+  "/.github",
+  "/.pytest_cache",
+  "/.ruff_cache",
+  "./.gitignore",
+  "./mkdocs.yml"
+  "./tests"
+]

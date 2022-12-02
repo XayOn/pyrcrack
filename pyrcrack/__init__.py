@@ -2,6 +2,7 @@
 
 Aircrack-NG python bindings
 """
+
 from contextvars import ContextVar
 
 from .aircrack import AircrackNg  # noqa
@@ -13,3 +14,5 @@ from .airdecloack import AirdecloackNg  # noqa
 from .airodump import AirodumpNg  # noqa
 
 MONITOR = ContextVar('monitor_interface')
+
+__version__ = '1.1.3'
