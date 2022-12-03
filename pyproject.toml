@@ -60,14 +60,14 @@ dependencies = [
 
 [tool.hatch.metadata.hooks.fancy-pypi-readme]
 content-type = "text/markdown"
-fragments = [{ path = "README.md" }, { path = "CHANGES.md" }]
+fragments = [{ path = "README.md" }, { path = "CHANGELOG.md" }]
 
 [tool.hatch.envs.default.scripts]
 cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=pyrcrack --cov=tests {args}"
 no-cov = "cov --no-cov {args}"
 
 [[tool.hatch.envs.test.matrix]]
-python = ["37", "38", "39", "310", "311"]
+python = ["38", "39", "310"]
 
 [tool.coverage.run]
 branch = true
@@ -122,3 +122,8 @@ ban-relative-imports = "parents"
 
 [tool.ruff.per-file-ignores]
 "tests/**/*" = ["I252", "S101", "B011"]
+
+[tool.commitizen]
+tag_format = "v$version"
+version_files = ["pyrcrack/__init__.py"]
+version = "1.1.4"
