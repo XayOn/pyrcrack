@@ -1,3 +1,9 @@
+## v1.2.3 (2022-12-03)
+
+### Fix
+
+- I was re-checking out the repo
+
 ## v1.2.2 (2022-12-03)
 
 ### Fix
