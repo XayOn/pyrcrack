@@ -1,12 +1,12 @@
 """Scan for targets and and pretty print some data."""
 import asyncio
-
-import pyrcrack
+import logging
 
 from rich.console import Console
 from rich.prompt import Prompt
 
-import logging
+import pyrcrack
+
 logging.basicConfig(level=logging.DEBUG)
 
 
@@ -14,11 +14,11 @@ async def scan_for_targets():
     """Scan for targets, return json."""
     console = Console()
     console.clear()
-    console.show_cursor(False)
+    console.show_cursor(show=False)
     airmon = pyrcrack.AirmonNg()
     interfaces = await airmon.interfaces
     console.print(interfaces.table)
-    interface = Prompt.ask('Select an interface',
+    interface = Prompt.ask("Select an interface",
                            choices=[a.interface for a in interfaces])
 
     async with airmon(interface) as mon:
@@ -27,10 +27,11 @@ async def scan_for_targets():
                 console.clear()
                 console.print(aps.table)
                 client = Prompt.ask(
-                    'Select an AP',
-                    choices=['continue', *[str(a) for a in range(len(aps))]])
+                    "Select an AP",
+                    choices=["continue", *[str(a) for a in range(len(aps))]],
+                )
 
-                if client != 'continue':
+                if client != "continue":
                     break
 
         async with pyrcrack.AirodumpNg() as pdump:

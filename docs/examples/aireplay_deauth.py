@@ -1,14 +1,14 @@
 """Deauth"""
+import asyncio
 from contextlib import suppress
 
 from rich.console import Console
 
-import asyncio
 import pyrcrack
 
 CONSOLE = Console()
 CONSOLE.clear()
-CONSOLE.show_cursor(False)
+CONSOLE.show_cursor(show=False)
 
 
 async def attack(apo):
@@ -40,7 +40,7 @@ async def deauth():
                 CONSOLE.print(result.table)
                 with suppress(KeyError):
                     ap = result[0]
-                    CONSOLE.print('Selected AP {}'.format(ap.bssid))
+                    CONSOLE.print("Selected AP {}".format(ap.bssid))
                     break
                 await asyncio.sleep(3)
     await attack(ap)
