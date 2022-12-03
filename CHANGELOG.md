@@ -1,3 +1,27 @@
+## v1.2.4 (2022-12-03)
+
+### Fix
+
+- Reorganized workflows
+
+## v1.2.3 (2022-12-03)
+
+### Fix
+
+- I was re-checking out the repo
+
+## v1.2.2 (2022-12-03)
+
+### Fix
+
+- Changed action for softprops/action-gh-release
+
+## v1.2.1 (2022-12-03)
+
+### Fix
+
+- Added missing commitizen dep
+
 ## v1.2.0 (2022-12-03)
 
 >>>>>>> d12f20d9790c04622957a14d2304e149b78d49df
