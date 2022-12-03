@@ -1,3 +1,9 @@
+## v1.2.5 (2022-12-03)
+
+### Fix
+
+- Fixed CI badge on readme
+
 ## v1.2.4 (2022-12-03)
 
 ### Fix
