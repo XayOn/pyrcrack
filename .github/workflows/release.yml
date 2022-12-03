@@ -20,3 +20,33 @@ jobs:
         uses: commitizen-tools/commitizen-action@master
         with:
           github_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+  create-github-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.8"
+          cache: "pip"
+          cache-dependency-path: pyproject.toml
+      - uses: actions/cache@v3
+        id: cache
+        with:
+          path: ${{ env.pythonLocation }}
+          key: ${{ runner.os }}-python-${{ env.pythonLocation }}-${{ hashFiles('pyproject.toml') }}-publish
+      - name: Install build dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: pip install build
+      - name: Build distribution
+        run: python -m build
+      - name: Generate temp ch
+        run: cz ch --dry-run > release.md
+      - uses: ncipollo/release-action@v1
+        with:
+          artifacts: "dist/*"
+          bodyFile: "release.md"
