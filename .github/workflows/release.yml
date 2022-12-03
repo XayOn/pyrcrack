@@ -1,4 +1,4 @@
-name: Bump version
+name: Release and publish
 
 on:
   push:
@@ -47,3 +47,7 @@ jobs:
           body_path: "body.md"
           tag_name: ${{ env.REVISION }} 
           files: dist/*
+      - name: Publish
+        uses: pypa/gh-action-pypi-publish@v1.5.1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
