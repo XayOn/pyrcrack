@@ -1,3 +1,9 @@
+## v1.2.2 (2022-12-03)
+
+### Fix
+
+- Changed action for softprops/action-gh-release
+
 ## v1.2.1 (2022-12-03)
 
 ### Fix
