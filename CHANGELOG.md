@@ -1,3 +1,9 @@
+## v1.2.4 (2022-12-03)
+
+### Fix
+
+- Reorganized workflows
+
 ## v1.2.3 (2022-12-03)
 
 ### Fix
