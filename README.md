@@ -4,8 +4,7 @@
 
 | | |
 | --- | --- |
-| CI/CD | [![CI - Test](https://github.com/xayon/pyrcrack/actions/workflows/test.yml/badge.svg)](https://github.com/xayon/pyrcrack/actions/workflows/test.yml) [![CD - Build Package](https://github.com/xayon/pyrcrack/actions/workflows/build.yml/badge.svg)](https://github.com/xayon/pyrcrack/actions/workflows/build.yml) |
-| Docs | [![Docs - Release](https://github.com/xayon/pyrcrack/actions/workflows/docs-release.yml/badge.svg)](https://github.com/xayon/pyrcrack/actions/workflows/docs-release.yml) [![Docs - Dev](https://github.com/xayon/pyrcrack/actions/workflows/docs-dev.yml/badge.svg)](https://github.com/xayon/pyrcrack/actions/workflows/docs-dev.yml) |
+| CI/CD | [![CI - Test](https://github.com/xayon/pyrcrack/actions/workflows/test.yml/badge.svg)](https://github.com/xayon/pyrcrack/actions/workflows/test.yml) [![CD - Build Package](https://github.com/xayon/pyrcrack/actions/workflows/publish.yml/badge.svg)](https://github.com/xayon/pyrcrack/actions/workflows/publish.yml) |
 | Package | [![PyPI - Version](https://img.shields.io/pypi/v/pyrcrack.svg?logo=pypi&label=PyPI&logoColor=gold)](https://pypi.org/project/pyrcrack/) [![PyPI - Downloads](https://img.shields.io/pypi/dm/pyrcrack.svg?color=blue&label=Downloads&logo=pypi&logoColor=gold)](https://pypi.org/project/pyrcrack/) [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pyrcrack.svg?logo=python&label=Python&logoColor=gold)](https://pypi.org/project/pyrcrack/) |
 | Meta | [![code style - yapf](https://img.shields.io/badge/code%20style-yapf-000000.svg)](https://github.com/psf/black) [![types - Mypy](https://img.shields.io/badge/types-Mypy-blue.svg)](https://github.com/python/mypy) [![imports - isort](https://img.shields.io/badge/imports-isort-ef8336.svg)](https://github.com/pycqa/isort) 
 
