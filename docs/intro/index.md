@@ -16,3 +16,13 @@ run them.
 
 Some classes expose themselves as async iterators, as airodump-ng's wich
 returns access points with its associated clients.
+
+# Common pitfals
+
+!!! danger
+
+    Make sure you have aircrack-ng installed and **on path**.
+    Most linux distros will not have any issue with this. Specialized distros
+    like khali do this by default.
+    On windows, you're basically on your own, but as far as you have
+    aircrack-ng tools on path, you should be good to go
