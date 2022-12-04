@@ -29,13 +29,13 @@ returns access points with its associated clients.
 
 ## Documentation
 
-The [documentation](https://xayon.github.io/pyrcrack) is made with [Material
+The [documentation](https://davidfrancos.net/pyrcrack) is made with [Material
 for MkDocs](https://github.com/squidfunk/mkdocs-material) and is hosted by
 [GitHub Pages](https://docs.github.com/en/pages).
 
 ### Examples
 
-Be sure to check the python [notebook example](./docs/examples/example.ipynb>)
+Be sure to check the python [notebook example](./docs/examples/example.ipynb)
 
 You can have also have a look at the examples/ folder for some usage examples,
 such as the basic "scan for targets", that will list available interfaces, let

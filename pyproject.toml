@@ -47,7 +47,9 @@ path = "pyrcrack/__init__.py"
 
 [tool.hatch.envs.default]
 dependencies = [
+	"pymdown-extensions",
 	"pytest",
+	"mkdocs-include-markdown-plugin",
 	"asynctest",
 	"pytest-cov",
 	"pydocstyle",
@@ -56,6 +58,12 @@ dependencies = [
 	"mkdocs",
 	"mkdocs-material",
 	"ruff",
+	"pillow",
+	"pygments",
+	"mkdocs-jupyter",
+	"cairosvg",
+	"mkautodoc",
+	"mkdocs-literate-nav"
 ]
 
 [tool.hatch.metadata.hooks.fancy-pypi-readme]
