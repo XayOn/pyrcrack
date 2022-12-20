@@ -190,6 +190,9 @@ class ExecutorHelper:
             self.called = True
             self.proc = await self.run(*self.run_args[0], **self.run_args[1])
 
+        if not asyncio.iscoroutine(self.results):
+            raise RuntimeError('Results must be a coroutine')
+
         current_results = await self.results
 
         if not self.running:
