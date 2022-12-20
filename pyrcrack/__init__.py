@@ -15,4 +15,4 @@ from .airodump import AirodumpNg  # noqa
 
 MONITOR = ContextVar("monitor_interface")
 
-__version__ = "1.2.5"
+__version__ = "1.2.6"
