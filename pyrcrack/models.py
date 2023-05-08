@@ -218,5 +218,5 @@ class AireplayResults(Result):
     """Aireplay results."""
 
     def __init__(self, data):
-        self.extend((AireplayResult(_data=a) for a in data.split("\n")
-                     if "BSSID" in a))
+        self.extend(AireplayResult(_data=a) for a in data.split("\n")
+                     if "BSSID" in a)

@@ -15,7 +15,7 @@ async def attack(apo):
     """Run aireplay deauth attack."""
     airmon = pyrcrack.AirmonNg()
     interfaces = await airmon.interfaces
-    CONSOLE.print("Starting airmon-ng with channel {}".format(apo.channel))
+    CONSOLE.print(f"Starting airmon-ng with channel {apo.channel}")
     interface = interfaces[0]
     async with airmon(interface.interface, apo.channel) as mon:
         async with pyrcrack.AireplayNg() as aireplay:
@@ -40,7 +40,7 @@ async def deauth():
                 CONSOLE.print(result.table)
                 with suppress(KeyError):
                     ap = result[0]
-                    CONSOLE.print("Selected AP {}".format(ap.bssid))
+                    CONSOLE.print(f"Selected AP {ap.bssid}")
                     break
                 await asyncio.sleep(3)
     await attack(ap)

@@ -134,6 +134,7 @@ class AirodumpNg(ExecutorHelper):
                 results = dotmap_data["detection-run"]["wireless-network"]
                 if results:
                     if isinstance(results, list):
+                        breakpoint()
                         return Result(
                             sorted(
                                 [AccessPoint(ap) for ap in results],

@@ -48,12 +48,12 @@ class Option:
     @staticmethod
     def long(word):
         """Extract long format option."""
-        return "--{}".format(word)
+        return f"--{word}"
 
     @staticmethod
     def short(word):
         """Extract short format option."""
-        return "-{}".format(word)
+        return f"-{word}"
 
     @property
     def parsed(self):
@@ -112,7 +112,7 @@ class ExecutorHelper:
     @functools.lru_cache  # noqa: B019
     def helpstr(self):
         """Extract help string for current command."""
-        helpcmd = "{} 2>&1; echo".format(self.command)
+        helpcmd = f"{self.command} 2>&1; echo"
         return subprocess.check_output(helpcmd, shell=True).decode()
 
     @property
@@ -143,8 +143,7 @@ class ExecutorHelper:
         ]
         self.logger.debug("Got options: %s", options)
 
-        opts = ([self.command] + list(args) +
-                list(itertools.chain(*(o.parsed for o in options))))
+        opts = ([self.command, *list(args), *list(itertools.chain(*(o.parsed for o in options)))])
 
         self.logger.debug("Running command: %s", opts)
         return opts
@@ -191,7 +190,7 @@ class ExecutorHelper:
             self.proc = await self.run(*self.run_args[0], **self.run_args[1])
 
         if not asyncio.iscoroutine(self.results):
-            raise RuntimeError('Results must be a coroutine')
+            raise RuntimeError("Results must be a coroutine")
 
         current_results = await self.results
 
