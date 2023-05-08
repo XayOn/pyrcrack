@@ -1,3 +1,9 @@
+## v1.2.6 (2022-12-20)
+
+### Fix
+
+- Fixed small typing issue
+
 ## v1.2.5 (2022-12-03)
 
 ### Fix

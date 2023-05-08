@@ -134,4 +134,4 @@ ban-relative-imports = "parents"
 [tool.commitizen]
 tag_format = "v$version"
 version_files = ["pyrcrack/__init__.py"]
-version = "1.2.5"
+version = "1.2.6"
