@@ -207,7 +207,9 @@ class AireplayResult(dict):
     """Single aiplay result line."""
 
     def __init__(self, *args, **kwargs):
-        self.update(parse(APL_FMT, kwargs.pop("_data")).named)
+        data = parse(APL_FMT, kwargs.pop("_data"))
+        if data:
+            self.update(data.named)
         super().__init__(*args, **kwargs)
 
     def asdict(self):
