@@ -48,6 +48,6 @@ jobs:
           tag_name: ${{ env.REVISION }} 
           files: dist/*
       - name: Publish
-        uses: pypa/gh-action-pypi-publish@v1.5.1
+        uses: pypa/gh-action-pypi-publish@v1.13.0
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
